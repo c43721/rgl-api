@@ -1,2 +1,1 @@
-# rglbans.com
- Scraped RGL pages to provide an easy-to-use API
+RGL API written in Nest.js TypeScript
