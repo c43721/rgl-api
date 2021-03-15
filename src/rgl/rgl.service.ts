@@ -1,5 +1,6 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
+import { toDate } from 'date-fns';
 
 @Injectable()
 export class RglService {
@@ -52,11 +53,15 @@ export class RglService {
 					};
 				}
 
+				const expiresAtString = $($(element).find('td')[4])
+					.text()
+					.trim();
+
 				players.push({
 					steamId: steamid,
 					name: $($(element).find('td')[1]).text().trim(),
 					link: `${RglService.PROFILE_PAGE}${steamid}`,
-					expiresAt: $($(element).find('td')[4]).text().trim(),
+					expiresAt: toDate(new Date(expiresAtString)),
 					teamDetails,
 				});
 			} else {
