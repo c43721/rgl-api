@@ -13,7 +13,7 @@ export class TimeInterceptor implements NestInterceptor {
 		const now = Date.now();
 		return next.handle().pipe(
 			map(data => {
-				return { ...data, time: `${Date.now() - now} ms` };
+				return { data, time: `${Date.now() - now} ms` };
 			}),
 		);
 	}

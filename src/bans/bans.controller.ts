@@ -25,6 +25,6 @@ export class BansController {
 	) {
 		this.logger.debug('Stale cache: Gathering fresh data.');
 		const newBans = await this.rglService.getBans(limit);
-		return { bans: newBans };
+		return newBans;
 	}
 }
