@@ -23,7 +23,7 @@ export class RglService {
 			.toPromise();
 	}
 
-	public async getBans(limit: number) {
+	public async getBans() {
 		this.logger.debug('Querying RGL page...');
 		const { data: bansPage } = await this.getPage(RglService.BAN_PAGE);
 
@@ -74,8 +74,6 @@ export class RglService {
 			(val, i) => (val = { ...val, reason: reasons[i] }),
 		);
 
-		if (limit === 1) return playerWithReason[0];
-
-		return playerWithReason.splice(0, limit);
+		return playerWithReason;
 	}
 }
