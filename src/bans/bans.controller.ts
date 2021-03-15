@@ -17,7 +17,7 @@ export class BansController {
 
 	constructor(private rglService: RglService) {}
 
-	@Get()
+	@Get('/latest')
 	@UseInterceptors(TimeInterceptor, CacheInterceptor)
 	async index(
 		@Query('limit', new DefaultValuePipe(10), new ParseIntPipe())
