@@ -50,10 +50,9 @@ export class BansService {
 
 		const bans = await this.getCachedBans();
 
-		if (limit)
-			bans.length > 1
-				? (returnedBans = bans.slice(0, limit))
-				: (returnedBans = bans[0]);
+		limit > 1
+			? (returnedBans = bans.slice(0, limit))
+			: (returnedBans = bans[0]);
 
 		const cron = this.getCron();
 
