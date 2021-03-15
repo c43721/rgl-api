@@ -4,6 +4,7 @@ import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../rgl/rgl.service';
 import { CronNames } from '../enums/crons.enum';
 import { Caches } from '../enums/cache.enum';
+import { Ban, LatestBanResponse } from './bans.model';
 
 @Injectable()
 export class BansService {
@@ -19,19 +20,19 @@ export class BansService {
 	@Cron('*/20 * * * *', {
 		name: CronNames.CRON_BAN,
 	})
-	private async scrapeBans(): Promise<Array<any>> {
+	private async scrapeBans() {
 		this.logger.log('Cron job: Scraping bans page...');
 		const bans = await this.rglService.getBans();
 
-		await this.cacheManager.set(Caches.BAN_CACHE, bans, {
+		await this.cacheManager.set<Ban[]>(Caches.BAN_CACHE, bans, {
 			ttl: null,
 		});
 
-		return await this.cacheManager.get(Caches.BAN_CACHE);
+		return await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
 	}
 
 	private async getCachedBans() {
-		const cachedBans: undefined | Array<any> = await this.cacheManager.get(
+		const cachedBans = await this.cacheManager.get<Ban[]>(
 			'LATEST_RGL_BANS',
 		);
 
@@ -44,8 +45,8 @@ export class BansService {
 		return this.schedulerRegistry.getCronJob(CronNames.CRON_BAN);
 	}
 
-	async getBans(limit: number = this.BAN_LIMIT) {
-		let returnedBans = null;
+	async getBans(limit: number = this.BAN_LIMIT): Promise<LatestBanResponse> {
+		let returnedBans: Ban[] | Ban = null;
 
 		const bans = await this.getCachedBans();
 
