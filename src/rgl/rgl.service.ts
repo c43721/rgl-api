@@ -12,10 +12,17 @@ export class RglService {
 	constructor(private httpService: HttpService) {}
 
 	private getPage(page: string) {
-		return this.httpService.get(page).toPromise();
+		return this.httpService
+			.get(page, {
+				headers: {
+					'User-Agent':
+						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
+				},
+			})
+			.toPromise();
 	}
 
-	public async getBans(limit: number = 10) {
+	public async getBans(limit: number) {
 		this.logger.debug('Querying RGL page...');
 		const { data: bansPage } = await this.getPage(RglService.BAN_PAGE);
 

@@ -1,14 +1,15 @@
 import {
 	CacheInterceptor,
 	Controller,
+	DefaultValuePipe,
 	Get,
 	Logger,
+	ParseIntPipe,
 	Query,
 	UseInterceptors,
 } from '@nestjs/common';
 import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
 import { RglService } from 'src/rgl/rgl.service';
-import { BanDto } from './dto/bans.dto';
 
 @Controller('bans')
 export class BansController {
@@ -18,9 +19,12 @@ export class BansController {
 
 	@Get()
 	@UseInterceptors(TimeInterceptor, CacheInterceptor)
-	async index(@Query() query: BanDto) {
-		this.logger.verbose('Stale cache: Gathering fresh data.');
-		const newBans = await this.rglService.getBans(query.limit);
+	async index(
+		@Query('limit', new DefaultValuePipe(10), new ParseIntPipe())
+		limit: number,
+	) {
+		this.logger.debug('Stale cache: Gathering fresh data.');
+		const newBans = await this.rglService.getBans(limit);
 		return { bans: newBans };
 	}
 }
