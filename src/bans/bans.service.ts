@@ -4,7 +4,7 @@ import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../rgl/rgl.service';
 import { CronNames } from '../enums/crons.enum';
 import { Caches } from '../enums/cache.enum';
-import { Ban, LatestBanResponse } from './bans.model';
+import { Ban } from './bans.interface';
 
 @Injectable()
 export class BansService {
@@ -32,9 +32,7 @@ export class BansService {
 	}
 
 	private async getCachedBans() {
-		const cachedBans = await this.cacheManager.get<Ban[]>(
-			'LATEST_RGL_BANS',
-		);
+		const cachedBans = await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
 
 		if (!cachedBans) return await this.scrapeBans();
 
@@ -45,7 +43,7 @@ export class BansService {
 		return this.schedulerRegistry.getCronJob(CronNames.CRON_BAN);
 	}
 
-	async getBans(limit: number = this.BAN_LIMIT): Promise<LatestBanResponse> {
+	async getBans(limit: number = this.BAN_LIMIT) {
 		let returnedBans: Ban[] | Ban = null;
 
 		const bans = await this.getCachedBans();

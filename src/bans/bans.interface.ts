@@ -13,9 +13,3 @@ export interface Ban {
     teamDetails: BanTeamDetails | null;
     reason: string
 }
-
-export interface LatestBanResponse {
-    bans: Ban[] | Ban;
-    nextScheduled:  Date;
-    lastScheduled: Date | null;
-}
