@@ -6,6 +6,8 @@ import { CronNames } from '../enums/crons.enum';
 import { Caches } from '../enums/cache.enum';
 import { Ban } from './bans.interface';
 
+const TEST_STARTING_BAN = '76561198306927279';
+
 @Injectable()
 export class BansService {
 	private BAN_LIMIT = 10;
@@ -20,7 +22,7 @@ export class BansService {
 	@Cron('*/20 * * * *', {
 		name: CronNames.CRON_BAN,
 	})
-	private async scrapeBans() {
+	private async scrapeBans(): Promise<Ban[]> {
 		this.logger.log('Scraping bans page...');
 		const bans = await this.rglService.getBans();
 
@@ -28,13 +30,45 @@ export class BansService {
 			ttl: null,
 		});
 
-		return await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
+		this.checkForNewBan(bans);
+
+		return bans;
+	}
+
+	public checkForNewBan(parsedArray: Ban[]): Ban[] {
+		this.logger.log('Checking for new banned players');
+
+		for (let i = 0; i < parsedArray.length; i++) {
+			const ban = parsedArray[i];
+			if (ban.steamId === TEST_STARTING_BAN) {
+				if (i === 0) break;
+				// New ban(s) detected
+				const newBansArray = parsedArray.slice(0, i);
+				this.logger.debug(`${newBansArray.length} new bans detected.`);
+				this.logger.debug(`Names: ${newBansArray.map(ban => ban.name).join(", ")}`);
+
+				return newBansArray;
+			}
+		}
+
+		if (parsedArray[parsedArray.length - 1].steamId === TEST_STARTING_BAN) {
+			// Situation. There's too many bans (lol!) and we don't have a way of reaching the 10 + ith ban (yet)
+			// @TODO: Find way to reach 10+ith ban
+			this.logger.warn(`10 new bans detected, but there was more. Ignoring unaccessable bans.`);
+
+			return parsedArray;
+		}
+
+		return [];
 	}
 
 	private async getCachedBans() {
 		const cachedBans = await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
 
-		if (!cachedBans) return await this.scrapeBans();
+		if (!cachedBans) {
+			await this.scrapeBans();
+			return await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
+		}
 
 		return cachedBans;
 	}
