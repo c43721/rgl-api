@@ -1,23 +1,32 @@
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+	CACHE_MANAGER,
+	Inject,
+	Injectable,
+	Logger,
+	OnModuleInit,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../rgl/rgl.service';
 import { CronNames } from '../enums/crons.enum';
 import { Caches } from '../enums/cache.enum';
 import { Ban } from './bans.interface';
-
-const TEST_STARTING_BAN = '76561198306927279';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BansService {
+	private STARTING_BAN: string;
 	private BAN_LIMIT = 10;
 	private logger = new Logger(BansService.name);
 
 	constructor(
 		private rglService: RglService,
 		private schedulerRegistry: SchedulerRegistry,
+		readonly configService: ConfigService,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
-	) {}
+	) {
+		this.STARTING_BAN = configService.get<string>('STARTING_BAN');
+	}
 
 	@Cron('*/20 * * * *', {
 		name: CronNames.CRON_BAN,
@@ -40,25 +49,35 @@ export class BansService {
 
 		for (let i = 0; i < parsedArray.length; i++) {
 			const ban = parsedArray[i];
-			if (ban.steamId === TEST_STARTING_BAN) {
+			if (ban.steamId === this.STARTING_BAN) {
 				if (i === 0) break;
+
 				// New ban(s) detected
 				const newBansArray = parsedArray.slice(0, i);
 				this.logger.debug(`${newBansArray.length} new bans detected.`);
-				this.logger.debug(`Names: ${newBansArray.map(ban => ban.name).join(", ")}`);
+				this.logger.debug(
+					`Names: ${newBansArray.map(ban => ban.name).join(', ')}`,
+				);
+
+				// First ban which is latest ban is now the new starting ban for next scrape
+				this.STARTING_BAN = newBansArray[0].steamId;
 
 				return newBansArray;
 			}
 		}
 
-		if (parsedArray[parsedArray.length - 1].steamId === TEST_STARTING_BAN) {
+		if (parsedArray[parsedArray.length - 1].steamId === this.STARTING_BAN) {
 			// Situation. There's too many bans (lol!) and we don't have a way of reaching the 10 + ith ban (yet)
 			// @TODO: Find way to reach 10+ith ban
-			this.logger.warn(`10 new bans detected, but there was more. Ignoring unaccessable bans.`);
+			this.logger.warn(
+				'10 new bans detected, but there was more. Ignoring unaccessable bans.',
+			);
+
 
 			return parsedArray;
 		}
 
+		this.logger.debug('No new bans');
 		return [];
 	}
 
