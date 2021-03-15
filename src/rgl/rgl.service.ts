@@ -1,6 +1,7 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { toDate } from 'date-fns';
+import { Ban } from 'src/bans/bans.interface';
 import { RglPages } from './rgl.enum';
 
 @Injectable()
@@ -20,7 +21,7 @@ export class RglService {
 			.toPromise();
 	}
 
-	public async getBans() {
+	public async getBans(): Promise<Ban[]> {
 		this.logger.debug('Querying RGL page...');
 		const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
 
