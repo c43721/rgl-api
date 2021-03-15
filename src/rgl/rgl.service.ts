@@ -69,6 +69,8 @@ export class RglService {
 			(val, i) => (val = { ...val, reason: reasons[i] }),
 		);
 
+		if (limit === 1) return playerWithReason[0];
+
 		return playerWithReason.splice(0, limit);
 	}
 }
