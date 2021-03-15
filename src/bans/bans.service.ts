@@ -21,7 +21,7 @@ export class BansService {
 		name: CronNames.CRON_BAN,
 	})
 	private async scrapeBans() {
-		this.logger.log('Cron job: Scraping bans page...');
+		this.logger.log('Scraping bans page...');
 		const bans = await this.rglService.getBans();
 
 		await this.cacheManager.set<Ban[]>(Caches.BAN_CACHE, bans, {

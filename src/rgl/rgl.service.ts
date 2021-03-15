@@ -1,18 +1,15 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { toDate } from 'date-fns';
+import { RglPages } from './rgl.enum';
 
 @Injectable()
 export class RglService {
 	private logger = new Logger(RglService.name);
 
-	public static BAN_PAGE = 'https://rgl.gg/Public/PlayerBanList.aspx';
-	public static PROFILE_PAGE = 'https://rgl.gg/Public/PlayerProfile.aspx?p=';
-	public static TEAM_PAGE = 'https://rgl.gg/Public/Team.aspx?t=';
-
 	constructor(private httpService: HttpService) {}
 
-	private getPage(page: string) {
+	private getPage(page: RglPages) {
 		return this.httpService
 			.get(page, {
 				headers: {
@@ -25,7 +22,7 @@ export class RglService {
 
 	public async getBans() {
 		this.logger.debug('Querying RGL page...');
-		const { data: bansPage } = await this.getPage(RglService.BAN_PAGE);
+		const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
 
 		this.logger.debug('RGL page loaded, parsing.');
 		const $ = load(bansPage);
@@ -35,6 +32,7 @@ export class RglService {
 
 		this.logger.debug('Looping through DOM, finding elements.');
 		$('tbody > tr').each((index, element) => {
+			// This is necessary, since each "block" of user/reasons are separated by tr's
 			if (index % 2 === 0) {
 				const steamid = $($(element).find('td')[0]).text().trim();
 				const div = $($(element).find('td')[2]).text().trim() ?? null;
@@ -49,7 +47,7 @@ export class RglService {
 						div,
 						currentTeam: $($(element).find('td')[3]).text().trim(),
 						teamId: parseInt(teamId),
-						teamLink: `${RglService.TEAM_PAGE}${teamId}`,
+						teamLink: `${RglPages.TEAM_PAGE}${teamId}`,
 					};
 				}
 
@@ -60,7 +58,7 @@ export class RglService {
 				players.push({
 					steamId: steamid,
 					name: $($(element).find('td')[1]).text().trim(),
-					link: `${RglService.PROFILE_PAGE}${steamid}`,
+					link: `${RglPages.BAN_PAGE}${steamid}`,
 					expiresAt: toDate(new Date(expiresAtString)),
 					teamDetails,
 				});
