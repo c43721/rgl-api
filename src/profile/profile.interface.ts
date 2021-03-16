@@ -18,7 +18,7 @@ export interface Experience {
     rank: string;
     recordWith: string;
     recordWithout: string | null;
-    amountWon: number | null;
+    amountWon: number;
     join: Date;
     left: Date | null;
     isCurrentTeam: boolean;

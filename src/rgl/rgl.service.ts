@@ -1,8 +1,14 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import {
+	HttpService,
+	Injectable,
+	Logger,
+	NotFoundException,
+} from '@nestjs/common';
 import { load } from 'cheerio';
-import { toDate } from 'date-fns';
 import { Ban } from 'src/bans/bans.interface';
+import { Profile } from 'src/profile/profile.interface';
 import { RglPages } from './rgl.enum';
+import ProfileHelper from './rgl.helper';
 
 @Injectable()
 export class RglService {
@@ -10,7 +16,7 @@ export class RglService {
 
 	constructor(private httpService: HttpService) {}
 
-	private getPage(page: RglPages) {
+	private getPage(page: RglPages | string) {
 		return this.httpService
 			.get(page, {
 				headers: {
@@ -22,7 +28,7 @@ export class RglService {
 	}
 
 	public async getBans(): Promise<Ban[]> {
-		this.logger.debug('Querying RGL page...');
+		this.logger.debug('Querying RGL bans page...');
 		const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
 
 		this.logger.debug('RGL page loaded, parsing.');
@@ -60,7 +66,7 @@ export class RglService {
 					steamId: steamid,
 					name: $($(element).find('td')[1]).text().trim(),
 					link: `${RglPages.BAN_PAGE}${steamid}`,
-					expiresAt: toDate(new Date(expiresAtString)),
+					expiresAt: new Date(expiresAtString),
 					teamDetails,
 				});
 			} else {
@@ -74,5 +80,114 @@ export class RglService {
 		);
 
 		return playerWithReason;
+	}
+
+	public async getProfile(steamId: string): Promise<Profile> {
+		this.logger.debug('Querying RGL profile page...');
+		const { data: profilePage } = await this.getPage(
+			RglPages.PROFILE_PAGE + steamId,
+		);
+
+		this.logger.debug('RGL page loaded, parsing.');
+		const $ = load(profilePage);
+
+		const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
+		if (!!hasProfile) throw new NotFoundException(steamId, hasProfile);
+
+		const trophiesRaw = $(ProfileHelper.player.trophies)
+			.text()
+			.split(/\s+/);
+
+		const name = $(ProfileHelper.player.name).text();
+		const verified = !!$(ProfileHelper.player.verified).length;
+		const probation = !!$(ProfileHelper.player.probation).length;
+		const banned = !!$(ProfileHelper.player.banned).length;
+		const avatar = $(ProfileHelper.player.avatar).attr().src;
+
+		const totalEarnings =
+			parseInt($(ProfileHelper.player.totalEarnings).text()) || 0;
+
+		const trophies = {
+			gold: parseInt(trophiesRaw[0]) || 0,
+			silver: parseInt(trophiesRaw[1]) || 0,
+			bronze: parseInt(trophiesRaw[2]) || 0,
+		};
+
+		const experience = [];
+		$(ProfileHelper.player.leagueHeading).each((i, heading) => {
+			/**
+			 * Category - RGL - Format
+			 */
+			const $h = $(heading);
+			const hText = $h.text();
+			const hTextParts = hText.split(' - ');
+
+			const category = hTextParts[0].toLowerCase();
+			const format = hTextParts[2].toLowerCase();
+
+			const $t = $h
+				.parent()
+				.nextAll(ProfileHelper.player.leagueTable._)
+				.first();
+
+			const seasons = $t
+				.find(ProfileHelper.player.leagueTable.season)
+				.map((i, elem) => $(elem).text().trim());
+			const divs = $t
+				.find(ProfileHelper.player.leagueTable.div)
+				.map((i, elem) => $(elem).text().trim());
+			const teams = $t
+				.find(ProfileHelper.player.leagueTable.team)
+				.map((i, elem) => $(elem).text().trim());
+			const endRanks = $t
+				.find(ProfileHelper.player.leagueTable.endRank)
+				.map((i, elem) => $(elem).text().trim());
+			const recordsWith = $t
+				.find(ProfileHelper.player.leagueTable.recordWith)
+				.map((i, elem) => $(elem).text().trim());
+			const recordsWithout = $t
+				.find(ProfileHelper.player.leagueTable.recordWithout)
+				.map((i, elem) => $(elem).text().trim());
+			const amountsWon = $t
+				.find(ProfileHelper.player.leagueTable.amountWon)
+				.map((i, elem) => $(elem).text().trim());
+			const joined = $t
+				.find(ProfileHelper.player.leagueTable.joined)
+				.map((i, elem) => $(elem).text().trim());
+			const left = $t
+				.find(ProfileHelper.player.leagueTable.left)
+				.map((i, elem) => $(elem).text().trim());
+
+			for (let i = 0; i < seasons.length; i++) {
+				experience.push({
+					category,
+					format,
+					season: String(seasons[i]).toLowerCase(),
+					div: String(divs[i]).toLowerCase(),
+					team: teams[i],
+					endRank: endRanks[i],
+					recordWith: recordsWith[i],
+					recordWithout: recordsWithout[i] || null,
+					amountWon: amountsWon[i],
+					joined: new Date(String(joined[i])),
+					left: new Date(String(left[i])) || null,
+					isCurrentTeam: !!left[i],
+				});
+			}
+		});
+
+		return {
+			steamId,
+			avatar,
+			name,
+			status: {
+				banned,
+				probation,
+				verified,
+			},
+			totalEarnings,
+			trophies,
+			experience,
+		};
 	}
 }

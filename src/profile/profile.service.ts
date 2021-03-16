@@ -6,9 +6,11 @@ import { RglService } from 'src/rgl/rgl.service';
 export class ProfileService {
 	constructor(private rglService: RglService) {}
 
-	private async scrapeProfilePage(page: RglPages) {}
+	private async getCachedProfile(steamId: string) {
+		return this.rglService.getProfile(steamId);
+	}
 
 	async getProfile(steamid: string) {
-		return true;
+		return this.getCachedProfile(steamid);
 	}
 }
