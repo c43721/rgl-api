@@ -65,7 +65,7 @@ export class RglService {
 				players.push({
 					steamId: steamid,
 					name: $($(element).find('td')[1]).text().trim(),
-					link: `${RglPages.BAN_PAGE}${steamid}`,
+					link: `${RglPages.PROFILE_PAGE}${steamid}`,
 					expiresAt: new Date(expiresAtString),
 					teamDetails,
 				});
