@@ -42,6 +42,7 @@ export class RglService {
 		$('tbody > tr').each((index, element) => {
 			// This is necessary, since each "block" of user/reasons are separated by tr's
 			if (index % 2 === 0) {
+				const banId = $(element).attr('id');
 				const steamid = $($(element).find('td')[0]).text().trim();
 				const div = $($(element).find('td')[2]).text().trim() ?? null;
 				const teamId = $($(element).find('td')[3])
@@ -64,6 +65,7 @@ export class RglService {
 					.trim();
 
 				players.push({
+					banId,
 					steamId: steamid,
 					name: $($(element).find('td')[1]).text().trim(),
 					link: `${RglPages.PROFILE_PAGE}${steamid}`,

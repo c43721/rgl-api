@@ -6,6 +6,7 @@ import { CronNames } from '../enums/crons.enum';
 import { Caches } from '../enums/cache.enum';
 import { Ban } from './bans.interface';
 import { ConfigService } from '@nestjs/config';
+import { DiscordService } from 'src/discord/discord.service';
 
 @Injectable()
 export class BansService {
@@ -16,6 +17,7 @@ export class BansService {
 	constructor(
 		private rglService: RglService,
 		private schedulerRegistry: SchedulerRegistry,
+		private discordService: DiscordService,
 		readonly configService: ConfigService,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {
@@ -33,12 +35,12 @@ export class BansService {
 			ttl: null,
 		});
 
-		this.checkForNewBan(bans);
+		await this.checkForNewBan(bans);
 
 		return bans;
 	}
 
-	public checkForNewBan(parsedArray: Ban[]): Ban[] {
+	public async checkForNewBan(parsedArray: Ban[]): Promise<Ban[]> {
 		this.logger.log('Checking for new banned players');
 
 		for (let i = 0; i < parsedArray.length; i++) {
@@ -49,12 +51,11 @@ export class BansService {
 				// New ban(s) detected
 				const newBansArray = parsedArray.slice(0, i);
 				this.logger.debug(`${newBansArray.length} new bans detected.`);
-				this.logger.debug(
-					`Names: ${newBansArray.map(ban => ban.name).join(', ')}`,
-				);
 
 				// First ban which is latest ban is now the new starting ban for next scrape
 				this.STARTING_BAN = newBansArray[0].steamId;
+
+				await this.discordService.sendDiscordNotification(newBansArray);
 
 				return newBansArray;
 			}
