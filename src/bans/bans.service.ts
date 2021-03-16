@@ -35,7 +35,9 @@ export class BansService {
 			ttl: null,
 		});
 
-		await this.checkForNewBan(bans);
+		// Don't await this! It will still send the message
+		// @TODO: Convert to use event-emitter instead?
+		this.checkForNewBan(bans);
 
 		return bans;
 	}
