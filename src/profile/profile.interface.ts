@@ -35,3 +35,19 @@ export interface Profile {
 
     experience: Experience[];
 }
+
+export interface Ban {
+    reason: string;
+    date: Date;
+    expired: boolean;
+    // category: string;
+}
+
+export interface ProfileBanDetails {
+    steamId: string;
+    banned: boolean;
+    probation: boolean;
+    verified: boolean;
+
+    details: Ban | null;
+}
