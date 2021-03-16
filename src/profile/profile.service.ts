@@ -1,22 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { RglPages } from 'src/rgl/rgl.enum';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import { Caches } from 'src/enums/cache.enum';
 import { RglService } from 'src/rgl/rgl.service';
-import { ProfileBanDetails } from './profile.interface';
+import { Profile, ProfileBanDetails } from './profile.interface';
 
 @Injectable()
 export class ProfileService {
-	constructor(private rglService: RglService) {}
+	constructor(
+		private rglService: RglService,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+	) {}
 
-	private async getCachedProfile(steamId: string) {
-		return this.rglService.getProfile(steamId);
-	}
+	async getProfile(steamId: string) {
+		const cachedProfile = await this.cacheManager.get<Profile>(Caches.PROFILE_CACHE + steamId)
 
-	async getProfile(steamid: string) {
-		return this.getCachedProfile(steamid);
+		if (!cachedProfile) {
+			const profile = await this.rglService.getProfile(steamId);
+
+			await this.cacheManager.set(Caches.PROFILE_CACHE + steamId, profile);
+
+			return profile;
+		}
+
+		return cachedProfile;
 	}
 
 	async getProfileBans(steamid: string, showDetails: boolean, showPrevious: boolean): Promise<ProfileBanDetails> {
-		const profile = await this.getCachedProfile(steamid);
+		const profile = await this.getProfile(steamid);
 
 		let profileToReturn: Omit<ProfileBanDetails, "details" | "previous"> = {
 			steamId: profile.steamId,
