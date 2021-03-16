@@ -27,10 +27,6 @@ const ProfileHelper = {
         banHistory: {
             banStartSelector: "#banhistory + .table.table-striped tbody tr:nth-child(1)",
             banEndSelector: BAN_TABLE_SELECTOR + "tbody",
-            group: BAN_TABLE_SELECTOR + "td:nth-child(1)",
-            from: BAN_TABLE_SELECTOR + "td:nth-child(3)",
-            to: BAN_TABLE_SELECTOR + "td:nth-child(4)",
-            reason: BAN_TABLE_SELECTOR + "td:nth-child(5)",
         }
     }
 };
