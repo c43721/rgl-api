@@ -1,7 +1,7 @@
 export interface BanTeamDetails {
     div: string;
     currentTeam: string;
-    teamId: number;
+    teamId: string;
     teamLink: string;
 }
 

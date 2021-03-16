@@ -55,7 +55,7 @@ export class RglService {
 					teamDetails = {
 						div,
 						currentTeam: $($(element).find('td')[3]).text().trim(),
-						teamId: parseInt(teamId),
+						teamId: teamId,
 						teamLink: `${RglPages.TEAM_PAGE}${teamId}`,
 					};
 				}
