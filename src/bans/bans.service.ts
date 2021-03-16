@@ -52,9 +52,15 @@ export class BansService {
 
 				// New ban(s) detected
 				const newBansArray = parsedArray.slice(0, i);
-				this.logger.debug(`${newBansArray.length} new bans detected.`);
+				this.logger.debug(`${newBansArray.length} new bans detected": `);
+				this.logger.debug(
+					newBansArray.map(ban => ban.steamId).join(', '),
+				);
 
 				// First ban which is latest ban is now the new starting ban for next scrape
+				this.logger.verbose(
+					`New starting ban: ${this.STARTING_BAN} -> ${newBansArray[0].steamId}`,
+				);
 				this.STARTING_BAN = newBansArray[0].steamId;
 
 				await this.discordService.sendDiscordNotification(newBansArray);
@@ -69,6 +75,14 @@ export class BansService {
 			this.logger.warn(
 				'10 new bans detected, but there was more. Ignoring unaccessable bans.',
 			);
+
+			// Notify that there is new starting ban, and set it again (since we don't want to do this loop-de-loop)
+			this.logger.verbose(
+				`New starting ban: ${this.STARTING_BAN} -> ${parsedArray[0].steamId}`,
+			);
+			this.STARTING_BAN = parsedArray[0].steamId;
+
+			await this.discordService.sendDiscordNotification(parsedArray);
 
 			return parsedArray;
 		}
