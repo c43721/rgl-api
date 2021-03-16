@@ -11,7 +11,7 @@ export class ProfileService {
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
-	async getProfile(steamId: string) {
+	private async getCachedProfile(steamId: string) {
 		const cachedProfile = await this.cacheManager.get<Profile>(
 			Caches.PROFILE_CACHE + steamId,
 		);
@@ -30,12 +30,17 @@ export class ProfileService {
 		return cachedProfile;
 	}
 
+	async getProfile(steamId: string) {
+		const { banHistory, ...profile } = await this.getCachedProfile(steamId);
+		return profile;
+	}
+
 	async getProfileBans(
 		steamid: string,
 		showDetails: boolean,
 		showPrevious: boolean,
-	): Promise<ProfileBanDetails> {
-		const profile = await this.getProfile(steamid);
+	): Promise<Omit<ProfileBanDetails, 'banHistory'>> {
+		const { banHistory, ...profile } = await this.getCachedProfile(steamid);
 
 		let profileToReturn: Omit<ProfileBanDetails, 'details' | 'previous'> = {
 			steamId: profile.steamId,
@@ -44,17 +49,17 @@ export class ProfileService {
 			verified: profile.status.verified,
 		};
 
-		if (showDetails && profile.banHistory[0].isCurrentBan) {
+		if (showDetails && banHistory[0].isCurrentBan) {
 			profileToReturn = {
 				...profileToReturn,
-				details: profile.banHistory[0],
+				details: banHistory[0],
 			} as ProfileBanDetails;
 		}
 
 		if (showPrevious) {
 			profileToReturn = {
 				...profileToReturn,
-				previous: profile.banHistory,
+				previous: banHistory,
 			} as ProfileBanDetails;
 		}
 
