@@ -1,10 +1,4 @@
-import {
-	CACHE_MANAGER,
-	Inject,
-	Injectable,
-	Logger,
-	OnModuleInit,
-} from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../rgl/rgl.service';
@@ -72,7 +66,6 @@ export class BansService {
 			this.logger.warn(
 				'10 new bans detected, but there was more. Ignoring unaccessable bans.',
 			);
-
 
 			return parsedArray;
 		}

@@ -11,5 +11,5 @@ export interface Ban {
     link: string;
     expiresAt: Date;
     teamDetails: BanTeamDetails | null;
-    reason: string
+    reason: string;
 }
