@@ -1,3 +1,5 @@
+const BAN_TABLE_SELECTOR = "#banhistory + .table.table-striped tbody tr ";
+
 const ProfileHelper = {
     player: {
         _: "#form1 > div.col-sm-10.col-sm-offset-1",
@@ -21,6 +23,14 @@ const ProfileHelper = {
             amountWon: ".table.table-striped tbody tr td:nth-child(7) strong",
             joined: ".table.table-striped tbody tr td:nth-child(8)",
             left: ".table.table-striped tbody tr td:nth-child(9)"
+        },
+        banHistory: {
+            banStartSelector: "#banhistory + .table.table-striped tbody tr:nth-child(1)",
+            banEndSelector: BAN_TABLE_SELECTOR + "tbody",
+            group: BAN_TABLE_SELECTOR + "td:nth-child(1)",
+            from: BAN_TABLE_SELECTOR + "td:nth-child(3)",
+            to: BAN_TABLE_SELECTOR + "td:nth-child(4)",
+            reason: BAN_TABLE_SELECTOR + "td:nth-child(5)",
         }
     }
 };

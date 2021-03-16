@@ -32,6 +32,7 @@ export interface Profile {
     status: ProfileStatus;
     totalEarnings: number;
     trophies: Trophy;
+    banHistory: Ban[];
 
     experience: Experience[];
 }
@@ -39,7 +40,8 @@ export interface Profile {
 export interface Ban {
     reason: string;
     date: Date;
-    expired: boolean;
+    expires: Date;
+    isCurrentBan: boolean;
     // category: string;
 }
 
@@ -50,4 +52,5 @@ export interface ProfileBanDetails {
     verified: boolean;
 
     details: Ban | null;
+    previous: Ban[] | null;
 }

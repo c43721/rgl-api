@@ -5,8 +5,9 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { load } from 'cheerio';
-import { Ban } from 'src/bans/bans.interface';
-import { Profile } from 'src/profile/profile.interface';
+import { Ban } from '../bans/bans.interface';
+import { Ban as ProfileBan } from '../profile/profile.interface';
+import { Profile } from '../profile/profile.interface';
 import { RglPages } from './rgl.enum';
 import ProfileHelper from './rgl.helper';
 
@@ -176,6 +177,21 @@ export class RglService {
 			}
 		});
 
+		const banElementArray = $(
+			ProfileHelper.player.banHistory.banStartSelector,
+		).nextUntil(ProfileHelper.player.banHistory.banEndSelector);
+
+		const allBans: ProfileBan[] = [];
+		banElementArray.each(function (_i, _element) {
+			const banRow = $(this);
+			allBans.push({
+				reason: $($(banRow).find("td")[4]).text().trim(),
+				date: new Date($($(banRow).find("td")[2]).text().trim()),
+				expires: new Date($($(banRow).find("td")[3]).text().trim()),
+				isCurrentBan: !!$(banRow).attr('style').trim()
+			});
+		});
+
 		return {
 			steamId,
 			avatar,
@@ -188,6 +204,7 @@ export class RglService {
 			totalEarnings,
 			trophies,
 			experience,
+			banHistory: allBans.reverse(), // Reversing so that we get new bans on top
 		};
 	}
 }

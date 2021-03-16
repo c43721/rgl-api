@@ -18,19 +18,19 @@ export class ProfileService {
 	async getProfileBans(steamid: string, showDetails: boolean, showPrevious: boolean): Promise<ProfileBanDetails> {
 		const profile = await this.getCachedProfile(steamid);
 
-		let profileToReturn: Omit<ProfileBanDetails, "details"> = {
+		let profileToReturn: Omit<ProfileBanDetails, "details" | "previous"> = {
 			steamId: profile.steamId,
 			banned: profile.status.banned,
 			probation: profile.status.probation,
 			verified: profile.status.verified,
 		}
 
-		if (showDetails) {
-			profileToReturn = {...profileToReturn, details: {}} as ProfileBanDetails
+		if (showDetails && profile.banHistory[0].isCurrentBan) {
+			profileToReturn = {...profileToReturn, details: profile.banHistory[0]} as ProfileBanDetails
 		}
 
 		if (showPrevious) {
-			profileToReturn = {...profileToReturn} as ProfileBanDetails
+			profileToReturn = {...profileToReturn, previous: profile.banHistory} as ProfileBanDetails
 		}
 
 		return profileToReturn as ProfileBanDetails;
