@@ -52,7 +52,7 @@ The `time` field is the amount of the the server took to respond to your request
         ],
         "nextScheduled": Date,
         "lastScheduled": Date,
-    }
+    },
     "time": "0 ms"
 }
 ```
