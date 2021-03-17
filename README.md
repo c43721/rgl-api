@@ -70,6 +70,7 @@ The `time` field is the amount of the the server took to respond to your request
 |--|--|--|
 | category\* | string | String or comma-separated string of the format (sixes => "trad. sixes") |
 <br/>
+
 **\*** category's type subject to change
 
 ```js
