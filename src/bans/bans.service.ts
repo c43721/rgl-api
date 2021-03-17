@@ -52,7 +52,7 @@ export class BansService {
 
 				// New ban(s) detected
 				const newBansArray = parsedArray.slice(0, i);
-				this.logger.debug(`${newBansArray.length} new bans detected": `);
+				this.logger.debug(`${newBansArray.length} new bans detected" `);
 				this.logger.debug(
 					newBansArray.map(ban => ban.steamId).join(', '),
 				);
