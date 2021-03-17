@@ -5,12 +5,15 @@ import {
 	Param,
 	ParseBoolPipe,
 	Query,
+	UseInterceptors,
 	ValidationPipe,
 } from '@nestjs/common';
+import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
 import { SteamId64Pipe } from 'src/pipes/steamid.pipe';
 import { ProfileService } from './profile.service';
 
 @Controller('profile')
+@UseInterceptors(TimeInterceptor)
 export class ProfileController {
 	constructor(private profileService: ProfileService) {}
 

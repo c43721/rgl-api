@@ -172,7 +172,7 @@ export class RglService {
 					endRank: endRanks[i],
 					recordWith: recordsWith[i],
 					recordWithout: recordsWithout[i] || null,
-					amountWon: amountsWon[i],
+					amountWon: amountsWon[i] || null,
 					joined: new Date(String(joined[i])),
 					left: new Date(String(left[i])) || null,
 					isCurrentTeam: !left[i],
