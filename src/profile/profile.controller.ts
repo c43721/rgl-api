@@ -5,6 +5,7 @@ import {
 	Param,
 	ParseBoolPipe,
 	Query,
+	ValidationPipe,
 } from '@nestjs/common';
 import { SteamId64Pipe } from 'src/pipes/steamid.pipe';
 import { ProfileService } from './profile.service';
@@ -14,8 +15,21 @@ export class ProfileController {
 	constructor(private profileService: ProfileService) {}
 
 	@Get(':steamid')
-	async index(@Param('steamid', new SteamId64Pipe()) steamId: string) {
-		return this.profileService.getProfile(steamId);
+	async index(
+		@Param('steamid', new SteamId64Pipe()) steamId: string,
+		@Query('category', new ValidationPipe({ transform: true }))
+		category: string[],
+	) {
+		const profile = await this.profileService.getProfile(steamId);
+		if (!category) return profile;
+
+		let { experience, ...rest } = profile;
+
+		experience = experience.filter(team =>
+			category.includes(team.category),
+		);
+
+		return { rest, experience };
 	}
 
 	@Get(':steamid/bans')
