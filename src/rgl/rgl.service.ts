@@ -29,16 +29,16 @@ export class RglService {
 	}
 
 	public async getBans(): Promise<Ban[]> {
-		this.logger.debug('Querying RGL bans page...');
+		const timer = Date.now();
+		this.logger.debug('Querying bans page from RGL...');
 		const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
 
-		this.logger.debug('RGL page loaded, parsing.');
+		this.logger.debug(`Bans page loaded in ${Date.now() - timer} ms`);
 		const $ = load(bansPage);
 
 		const players = [];
 		const reasons = [];
 
-		this.logger.debug('Looping through DOM, finding elements.');
 		$('tbody > tr').each((index, element) => {
 			// This is necessary, since each "block" of user/reasons are separated by tr's
 			if (index % 2 === 0) {
@@ -76,7 +76,6 @@ export class RglService {
 				reasons.push($(element).text().trim());
 			}
 		});
-		this.logger.debug('Finished scrape');
 
 		const playerWithReason = players.map(
 			(val, i) => (val = { ...val, reason: reasons[i] }),
@@ -86,13 +85,14 @@ export class RglService {
 	}
 
 	public async getProfile(steamId: string): Promise<Profile> {
-		this.logger.debug(`Querying profile ${steamId} from RGL...`);
-		const profileTimer = Date.now();
+		this.logger.debug(`Querying profile page (${steamId}) from RGL...`);
+		const timer = Date.now();
 		const { data: profilePage } = await this.getPage(
 			RglPages.PROFILE_PAGE + steamId,
 		);
-		const rglProfilePageTime = Date.now() - profileTimer;
-		this.logger.debug(`RGL page loaded in ${rglProfilePageTime} ms`);
+		this.logger.debug(
+			`Profile (${steamId}) page loaded in ${Date.now() - timer} ms`,
+		);
 
 		const $ = load(profilePage);
 		const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();

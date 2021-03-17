@@ -7,6 +7,9 @@ import { Caches } from '../enums/cache.enum';
 import { Ban } from './bans.interface';
 import { ConfigService } from '@nestjs/config';
 import { DiscordService } from 'src/discord/discord.service';
+import { Ban as BanClass, BanSchema } from './schemas/bans.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class BansService {
@@ -18,10 +21,47 @@ export class BansService {
 		private rglService: RglService,
 		private schedulerRegistry: SchedulerRegistry,
 		private discordService: DiscordService,
-		readonly configService: ConfigService,
+		private configService: ConfigService,
+		@InjectModel(BanClass.name)
+		private readonly banModel: Model<BanSchema>,
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
-	) {
-		this.STARTING_BAN = configService.get<string>('STARTING_BAN');
+	) {}
+
+	async setStartingBan(): Promise<void> {
+		const envStartingBan = this.configService.get<string>('STARTING_BAN');
+		const mongoStartingBan = await this.banModel.findOne({});
+
+		if (!mongoStartingBan?.startingBan) {
+			try {
+				const newMongoStartingBan = new this.banModel({
+					startingBan: envStartingBan,
+				});
+				await newMongoStartingBan.save();
+				this.logger.log('Starting ban will come from env.');
+
+				this.STARTING_BAN = envStartingBan;
+			} catch (err) {
+				this.logger.error(
+					'Cannot save schema! Starting ban will not be saved in MongoDB.',
+				);
+			}
+		}
+
+		this.STARTING_BAN = mongoStartingBan.startingBan ?? envStartingBan;
+	}
+
+	private async setNewStartingBan(steamId: string) {
+		try {
+			const steamIdFromDb = await this.banModel.findOne({});
+
+			steamIdFromDb.startingBan = steamId;
+			this.STARTING_BAN = steamId;
+
+			this.logger.debug('Successfully saved new starting steamid');
+			return await steamIdFromDb.save();
+		} catch (err) {
+			this.logger.error(`Failed to save id ${steamId}!`);
+		}
 	}
 
 	@Cron('*/20 * * * *', {
@@ -43,7 +83,7 @@ export class BansService {
 	}
 
 	public async checkForNewBan(parsedArray: Ban[]): Promise<Ban[]> {
-		this.logger.log('Checking for new banned players');
+		this.logger.log('Checking for new banned players...');
 
 		for (let i = 0; i < parsedArray.length; i++) {
 			const ban = parsedArray[i];
@@ -52,7 +92,7 @@ export class BansService {
 
 				// New ban(s) detected
 				const newBansArray = parsedArray.slice(0, i);
-				this.logger.debug(`${newBansArray.length} new bans detected" `);
+				this.logger.debug(`${newBansArray.length} new bans detected:`);
 				this.logger.debug(
 					newBansArray.map(ban => ban.steamId).join(', '),
 				);
@@ -61,7 +101,7 @@ export class BansService {
 				this.logger.verbose(
 					`New starting ban: ${this.STARTING_BAN} -> ${newBansArray[0].steamId}`,
 				);
-				this.STARTING_BAN = newBansArray[0].steamId;
+				await this.setNewStartingBan(newBansArray[0].steamId);
 
 				await this.discordService.sendDiscordNotification(newBansArray);
 
@@ -80,7 +120,7 @@ export class BansService {
 			this.logger.verbose(
 				`New starting ban: ${this.STARTING_BAN} -> ${parsedArray[0].steamId}`,
 			);
-			this.STARTING_BAN = parsedArray[0].steamId;
+			await this.setNewStartingBan(parsedArray[0].steamId);
 
 			await this.discordService.sendDiscordNotification(parsedArray);
 
