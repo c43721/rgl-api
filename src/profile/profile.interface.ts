@@ -28,6 +28,7 @@ export interface Profile {
     steamId: string;
     avatar: string;
     name: string;
+    link: string;
 
     status: ProfileStatus;
     totalEarnings: number;

@@ -86,14 +86,15 @@ export class RglService {
 	}
 
 	public async getProfile(steamId: string): Promise<Profile> {
-		this.logger.debug('Querying RGL profile page...');
+		this.logger.debug(`Querying profile ${steamId} from RGL...`);
+		const profileTimer = Date.now();
 		const { data: profilePage } = await this.getPage(
 			RglPages.PROFILE_PAGE + steamId,
 		);
+		const rglProfilePageTime = Date.now() - profileTimer;
+		this.logger.debug(`RGL page loaded in ${rglProfilePageTime} ms`);
 
-		this.logger.debug('RGL page loaded, parsing.');
 		const $ = load(profilePage);
-
 		const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
 		if (!!hasProfile) throw new NotFoundException(steamId, hasProfile);
 
@@ -108,7 +109,7 @@ export class RglService {
 		const avatar = $(ProfileHelper.player.avatar).attr().src;
 
 		const totalEarnings =
-			parseInt($(ProfileHelper.player.totalEarnings).text()) || 0;
+			$(ProfileHelper.player.totalEarnings).text().slice(1) || '0';
 
 		const trophies = {
 			gold: parseInt(trophiesRaw[0]) || 0,
@@ -128,36 +129,36 @@ export class RglService {
 			const category = hTextParts[0].toLowerCase();
 			const format = hTextParts[2].toLowerCase();
 
-			const $t = $h
+			const $tables = $h
 				.parent()
 				.nextAll(ProfileHelper.player.leagueTable._)
 				.first();
 
-			const seasons = $t
+			const seasons = $tables
 				.find(ProfileHelper.player.leagueTable.season)
 				.map((i, elem) => $(elem).text().trim());
-			const divs = $t
+			const divs = $tables
 				.find(ProfileHelper.player.leagueTable.div)
 				.map((i, elem) => $(elem).text().trim());
-			const teams = $t
+			const teams = $tables
 				.find(ProfileHelper.player.leagueTable.team)
 				.map((i, elem) => $(elem).text().trim());
-			const endRanks = $t
+			const endRanks = $tables
 				.find(ProfileHelper.player.leagueTable.endRank)
 				.map((i, elem) => $(elem).text().trim());
-			const recordsWith = $t
+			const recordsWith = $tables
 				.find(ProfileHelper.player.leagueTable.recordWith)
 				.map((i, elem) => $(elem).text().trim());
-			const recordsWithout = $t
+			const recordsWithout = $tables
 				.find(ProfileHelper.player.leagueTable.recordWithout)
 				.map((i, elem) => $(elem).text().trim());
-			const amountsWon = $t
+			const amountsWon = $tables
 				.find(ProfileHelper.player.leagueTable.amountWon)
 				.map((i, elem) => $(elem).text().trim());
-			const joined = $t
+			const joined = $tables
 				.find(ProfileHelper.player.leagueTable.joined)
 				.map((i, elem) => $(elem).text().trim());
-			const left = $t
+			const left = $tables
 				.find(ProfileHelper.player.leagueTable.left)
 				.map((i, elem) => $(elem).text().trim());
 
@@ -174,7 +175,7 @@ export class RglService {
 					amountWon: amountsWon[i],
 					joined: new Date(String(joined[i])),
 					left: new Date(String(left[i])) || null,
-					isCurrentTeam: !!left[i],
+					isCurrentTeam: !left[i],
 				});
 			}
 		});
@@ -187,10 +188,10 @@ export class RglService {
 		banElementArray.each(function (_i, _element) {
 			const banRow = $(this);
 			allBans.push({
-				reason: $($(banRow).find("td")[4]).text().trim(),
-				date: new Date($($(banRow).find("td")[2]).text().trim()),
-				expires: new Date($($(banRow).find("td")[3]).text().trim()),
-				isCurrentBan: !!$(banRow).attr('style').trim()
+				reason: $($(banRow).find('td')[4]).text().trim(),
+				date: new Date($($(banRow).find('td')[2]).text().trim()),
+				expires: new Date($($(banRow).find('td')[3]).text().trim()),
+				isCurrentBan: !!$(banRow).attr('style').trim(),
 			});
 		});
 
@@ -198,12 +199,13 @@ export class RglService {
 			steamId,
 			avatar,
 			name,
+			link: RglPages.PROFILE_PAGE + steamId,
 			status: {
 				banned,
 				probation,
 				verified,
 			},
-			totalEarnings,
+			totalEarnings: parseInt(totalEarnings),
 			trophies,
 			experience,
 			banHistory: allBans.reverse(), // Reversing so that we get new bans on top
