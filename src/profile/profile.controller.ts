@@ -32,7 +32,7 @@ export class ProfileController {
 			category.includes(team.category),
 		);
 
-		return { rest, experience };
+		return { ...rest, experience };
 	}
 
 	@Get(':steamid/bans')
