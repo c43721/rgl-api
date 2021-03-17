@@ -127,7 +127,7 @@ export class BansService {
 			return parsedArray;
 		}
 
-		this.logger.debug('No new bans');
+		this.logger.log('No new bans');
 		return [];
 	}
 
