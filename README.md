@@ -36,7 +36,7 @@ All relavent data will be posted in the `data` field. An example a response woul
 |--|--|--|
 | limit | number | Limit amount of returned bans |
 
-```json
+```
 {
 	"data": {
 		"bans": [
@@ -74,7 +74,7 @@ All relavent data will be posted in the `data` field. An example a response woul
 | category* | string| String or comma-separated string of the format (sixes => "trad. sixes") |
 **\*** category may change to an enum value
 
-```json
+```
 {
 	"data": {
 		"steamId": String,
@@ -120,7 +120,7 @@ All relavent data will be posted in the `data` field. An example a response woul
 | details | boolean | Details of the current ban the user has |
 | previous | boolean | Array of details of all past bans the user had |
 
-```json
+```
 {
 	"data": {
 		"steamId": String,
