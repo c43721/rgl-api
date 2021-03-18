@@ -108,7 +108,8 @@ export class BansService {
       }
     }
 
-    if (parsedArray[parsedArray.length - 1].steamId !== this.STARTING_BAN) {
+    // @TODO: This doesn't work for when bans are >10 and the bans haven't changed
+    if (parsedArray[parsedArray.length - 1].steamId === this.STARTING_BAN) {
       // Situation. There's too many bans (lol!) and we don't have a way of reaching the 10 + ith ban (yet)
       // @TODO: Find way to reach 10+ith ban
       this.logger.warn(
