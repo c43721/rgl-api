@@ -53,7 +53,8 @@ export class PuppeteerService {
   private async createPage(url: string) {
     const browser = await launchBrowser({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: { // Needed or else screenshots can't be created
+      defaultViewport: {
+        // Needed or else screenshots can't be created
         height: 925,
         width: 1000,
       },

@@ -49,6 +49,7 @@ export class DiscordService {
         ];
       }
 
+      // This is inefficient. I should recieve an array beforhand of screenshot elements, so I can re-use a puppeteer instance.
       const screenshot = await this.puppeteerService.generateBanScreenshot(
         ban.banId,
       );
