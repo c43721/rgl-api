@@ -26,7 +26,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 ### Bans API
 
-`GET /bans/latest`
+### `GET /bans/latest`
 
 **Query fields:**
 | Name | Type | Description |
@@ -63,7 +63,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 ### Profile API
 
-`GET /profile/:steamid`
+### `GET /profile/:steamid`
 
 **Query fields:**
 | Name | Type | Description |
@@ -112,7 +112,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 <br />
 
-`GET /profile/:steamid/bans`
+### `GET /profile/:steamid/bans`
 
 **Query fields:**
 | Name | Type | Description |
@@ -132,14 +132,16 @@ The `time` field is the amount of the the server took to respond to your request
         "details": {
             "reason": String,
             "date": Date,
-            "expires": Date "isCurrentBan": Boolean
+            "expires": Date,
+            "isCurrentBan": Boolean
         },
 
         // Present on "previous" query, has all bans including current ban.
         "previous": [{
                 "reason": String,
                 "date": Date,
-                "expires": Date "isCurrentBan": Boolean
+                "expires": Date,
+                "isCurrentBan": Boolean
             ]
         },
     },
