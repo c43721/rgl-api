@@ -48,8 +48,7 @@ export class BansService {
       }
     }
 
-    // this.STARTING_BAN = mongoStartingBan.startingBan;
-    this.STARTING_BAN = envStartingBan;
+    this.STARTING_BAN = mongoStartingBan.startingBan;
   }
 
   private async setNewStartingBan(steamId: string) {
