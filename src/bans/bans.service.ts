@@ -40,7 +40,7 @@ export class BansService {
         this.logger.log('Starting ban will come from env.');
 
         this.STARTING_BAN = envStartingBan;
-		return;
+        return;
       } catch (err) {
         this.logger.error(
           'Cannot save schema! Starting ban will not be saved in MongoDB.',
@@ -108,8 +108,8 @@ export class BansService {
         return newBansArray;
       }
     }
-
-    if (parsedArray[parsedArray.length - 1].steamId === this.STARTING_BAN) {
+    
+    if (parsedArray[parsedArray.length - 1].steamId !== this.STARTING_BAN) {
       // Situation. There's too many bans (lol!) and we don't have a way of reaching the 10 + ith ban (yet)
       // @TODO: Find way to reach 10+ith ban
       this.logger.warn(

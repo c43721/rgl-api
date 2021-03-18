@@ -13,7 +13,7 @@ export class PuppeteerService {
     options: SerializableOrJSHandle,
     page: Page,
   ) {
-    return await page.evaluate((options: SerializableOrJSHandle) => {
+    return await page.evaluate(options => {
       let bounds = {
         x: 0,
         y: 0,
@@ -34,8 +34,8 @@ export class PuppeteerService {
           if (!document.querySelector(currentOption.selector))
             throw new Error('Top element not found.');
 
-          let element = document.querySelector(currentOption.selector);
-          let boundingClientRect = element.getBoundingClientRect();
+          const element = document.querySelector(currentOption.selector);
+          const boundingClientRect = element.getBoundingClientRect();
 
           if (edge == 'top') bounds.y = boundingClientRect[currentOption.edge];
           if (edge == 'left') bounds.x = boundingClientRect[currentOption.edge];
@@ -53,6 +53,10 @@ export class PuppeteerService {
   private async createPage(url: string) {
     const browser = await launchBrowser({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: { // Needed or else screenshots can't be created
+        height: 925,
+        width: 1000,
+      },
       headless: false,
     });
 
@@ -101,7 +105,6 @@ export class PuppeteerService {
 
     const screenshotBuffer = await page.screenshot({
       clip: clipBounds,
-      encoding: 'binary',
     });
 
     await this.closeBrowser(browser);
