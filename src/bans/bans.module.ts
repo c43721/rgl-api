@@ -9,23 +9,23 @@ import { BansService } from './bans.service';
 import { BanSchema, Ban } from './schemas/bans.schema';
 
 @Module({
-	imports: [
-		HttpModule,
-		CacheModule.register({
-			ttl: null,
-		}),
-		ScheduleModule.forRoot(),
-		ConfigModule.forRoot(),
-		DiscordModule,
-		MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }]),
-	],
-	providers: [RglService, BansService],
-	controllers: [BansController],
+  imports: [
+    HttpModule,
+    CacheModule.register({
+      ttl: null,
+    }),
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot(),
+    DiscordModule,
+    MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }]),
+  ],
+  providers: [RglService, BansService],
+  controllers: [BansController],
 })
 export class BansModule implements OnModuleInit {
-	constructor(private banService: BansService) {}
+  constructor(private banService: BansService) {}
 
-	async onModuleInit() {
-		await this.banService.setStartingBan();
-	}
+  async onModuleInit() {
+    await this.banService.setStartingBan();
+  }
 }

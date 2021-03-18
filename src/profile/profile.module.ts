@@ -5,14 +5,14 @@ import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 
 @Module({
-	imports: [
-		RglModule,
-		HttpModule,
-		CacheModule.register({
-			ttl: 60 * 60 * 24, // 1 day
-		}),
-	],
-	providers: [RglService, ProfileService],
-	controllers: [ProfileController],
+  imports: [
+    RglModule,
+    HttpModule,
+    CacheModule.register({
+      ttl: 60 * 60 * 24, // 1 day
+    }),
+  ],
+  providers: [RglService, ProfileService],
+  controllers: [ProfileController],
 })
 export class ProfileModule {}
