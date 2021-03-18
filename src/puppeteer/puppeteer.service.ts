@@ -58,7 +58,6 @@ export class PuppeteerService {
         height: 925,
         width: 1000,
       },
-      headless: false,
     });
 
     const page = await browser.newPage();
