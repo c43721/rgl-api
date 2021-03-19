@@ -1,11 +1,12 @@
 FROM buildkite/puppeteer
 
-COPY package.json ./
-COPY yarn.lock ./
+WORKDIR /opt/app
+
+COPY package.json .
+COPY yarn.lock .
+COPY . .
 
 RUN yarn
-
-COPY . .
 
 RUN ["yarn", "build"]
 
