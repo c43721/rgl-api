@@ -63,7 +63,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 ### Profile API
 
-### `GET /profile/:steamid`
+### `GET /profiles/:steamid`
 
 **Query fields:**
 | Name | Type | Description |
@@ -112,7 +112,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 <br />
 
-### `GET /profile/:steamid/bans`
+### `GET /profiles/:steamid/bans`
 
 **Query fields:**
 | Name | Type | Description |
