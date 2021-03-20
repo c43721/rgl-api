@@ -68,7 +68,7 @@ The `time` field is the amount of the the server took to respond to your request
 **Query fields:**
 | Name | Type | Description |
 |--|--|--|
-| format | <a href="#enums">enum</a> | String or comma-separated string of the format (sixes, highlander, ect) |
+| formats | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
 <br/>
 
 ```js
