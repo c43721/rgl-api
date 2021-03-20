@@ -2,7 +2,7 @@ import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Caches } from 'src/enums/cache.enum';
 import { RglService } from 'src/rgl/rgl.service';
-import { Profile, ProfileBanDetails } from './profile.interface';
+import { Experience, Profile, ProfileBanDetails } from './profile.interface';
 
 @Injectable()
 export class ProfileService {
@@ -61,5 +61,17 @@ export class ProfileService {
     }
 
     return profileToReturn as ProfileBanDetails;
+  }
+
+  filterExperience(experience: Experience[], formats: string[]): Experience[] {
+    const newExperience = [];
+    formats.map(format => {
+      const filteredExperience = experience.filter(team =>
+        team.season.startsWith(format),
+      );
+      filteredExperience.length ? newExperience.push(filteredExperience) : null;
+    });
+
+    return newExperience;
   }
 }

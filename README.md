@@ -68,10 +68,8 @@ The `time` field is the amount of the the server took to respond to your request
 **Query fields:**
 | Name | Type | Description |
 |--|--|--|
-| category\* | string | String or comma-separated string of the format (sixes => "trad. sixes") |
+| format | <a href="#enums">enum</a> | String or comma-separated string of the format (sixes, highlander, ect) |
 <br/>
-
-**\*** category's type subject to change
 
 ```js
 {
@@ -150,6 +148,13 @@ The `time` field is the amount of the the server took to respond to your request
 ```
 
 <br />
+
+## Enums
+
+|Name| Values |
+|--|--|
+| format | `sixes, highlander, prolander, nr6s, nr` |
+
 
 ## Issues, Questions
 

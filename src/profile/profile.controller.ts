@@ -1,4 +1,5 @@
 import {
+  ClassSerializerInterceptor,
   Controller,
   DefaultValuePipe,
   Get,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
 import { SteamId64Pipe } from 'src/pipes/steamid.pipe';
+import { ProfileQueryDto } from './dto/profile-query.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profiles')
@@ -20,15 +22,19 @@ export class ProfileController {
   @Get(':steamid')
   async index(
     @Param('steamid', new SteamId64Pipe()) steamId: string,
-    @Query('category', new ValidationPipe({ transform: true }))
-    category: string[],
+    @Query(new ValidationPipe({ transform: true }))
+    { formats }: ProfileQueryDto,
   ) {
     const profile = await this.profileService.getProfile(steamId);
-    if (!category) return profile;
-
     let { experience, ...rest } = profile;
 
-    experience = experience.filter(team => category.includes(team.category));
+    if (formats) {
+      const newExperience = this.profileService.filterExperience(
+        experience,
+        formats,
+      );
+      experience = newExperience;
+    }
 
     return { ...rest, experience };
   }
