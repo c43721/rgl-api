@@ -36,7 +36,7 @@ export class ProfileService {
     steamid: string,
     showDetails: boolean,
     showPrevious: boolean,
-  ): Promise<Omit<ProfileBanDetails, 'banHistory'>> {
+  ): Promise<ProfileBanDetails> {
     const { banHistory, ...profile } = await this.getCachedProfile(steamid);
 
     let profileToReturn: Omit<ProfileBanDetails, 'details' | 'previous'> = {
