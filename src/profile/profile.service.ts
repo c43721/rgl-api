@@ -64,14 +64,10 @@ export class ProfileService {
   }
 
   filterExperience(experience: Experience[], formats: string[]): Experience[] {
-    const newExperience = [];
-    formats.map(format => {
-      const filteredExperience = experience.filter(team =>
-        team.season.startsWith(format),
-      );
-      filteredExperience.length ? newExperience.push(filteredExperience) : null;
-    });
-
-    return newExperience;
+    return (
+      experience.filter(team =>
+        formats.some(format => team.season.startsWith(format)),
+      ) || []
+    );
   }
 }
