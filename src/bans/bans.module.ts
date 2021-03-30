@@ -10,14 +10,13 @@ import { BanSchema, Ban } from './schemas/bans.schema';
 
 @Module({
   imports: [
-    HttpModule,
+    MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }]),
+    ScheduleModule.forRoot(),
     CacheModule.register({
       ttl: null,
     }),
-    ScheduleModule.forRoot(),
-    ConfigModule.forRoot(),
+    HttpModule,
     DiscordModule,
-    MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }]),
   ],
   providers: [RglService, BansService],
   controllers: [BansController],
