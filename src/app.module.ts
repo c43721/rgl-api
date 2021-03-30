@@ -9,11 +9,9 @@ import { PuppeteerService } from './puppeteer/puppeteer.service';
 
 @Module({
   imports: [
-    BansModule,
-    RglModule,
-    HttpModule,
-    ProfileModule,
-    DiscordModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -23,6 +21,11 @@ import { PuppeteerService } from './puppeteer/puppeteer.service';
       }),
       inject: [ConfigService],
     }),
+    BansModule,
+    RglModule,
+    HttpModule,
+    ProfileModule,
+    DiscordModule,
   ],
   providers: [PuppeteerService],
 })
