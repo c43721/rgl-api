@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmbedFieldData, MessageAttachment, WebhookClient } from 'discord.js';
+import * as moment from 'moment';
 import { Ban } from 'src/bans/bans.interface';
 import { Colors } from 'src/enums/colors.enum';
 import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
@@ -27,11 +28,36 @@ export class DiscordService {
     const webhookClient = new WebhookClient(WEBHOOK_ID, WEBHOOK_TOKEN);
 
     for (const ban of banArray.reverse()) {
-      let fields: Array<EmbedFieldData> | null = null;
+      const expirationMomentObject = moment(ban.expiresAt);
 
-      if (ban.teamDetails?.name) {
+      const fields: EmbedFieldData[] = [
+        {
+          name: 'Steam ID',
+          value: ban.steamId,
+          inline: true,
+        },
+        {
+          name: 'Expires',
+          value: `${expirationMomentObject.format('MM-DD-YYYY')}${
+            expirationMomentObject.isAfter(moment()) &&
+            expirationMomentObject.isAfter(moment().add('5 years'))
+              ? ` (${expirationMomentObject.toNow(true)})`
+              : ''
+          }`,
+          inline: true,
+        },
+        // Needed or else we get a 3/2 distribution of inline-embeds
+        {
+          name: '\u200b',
+          value: '\u200b',
+          inline: true,
+        },
+      ];
+
+      if (!!ban.teamDetails?.name) {
         const { link, div, name } = ban.teamDetails;
-        fields = [
+
+        fields.push(
           {
             name: 'Team Name',
             value: name,
@@ -47,7 +73,7 @@ export class DiscordService {
             value: `[Team page](${link})`,
             inline: true,
           },
-        ];
+        );
       }
 
       // This is inefficient. I should recieve an array beforhand of screenshot elements, so I can re-use a puppeteer instance.
