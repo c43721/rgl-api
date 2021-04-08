@@ -28,12 +28,13 @@ export class DiscordService {
 
     for (const ban of banArray.reverse()) {
       let fields: Array<EmbedFieldData> | null = null;
-      if (!!ban.teamDetails?.currentTeam) {
-        const { currentTeam, div, teamLink } = ban.teamDetails;
+
+      if (ban.teamDetails?.name) {
+        const { link, div, name } = ban.teamDetails;
         fields = [
           {
             name: 'Team Name',
-            value: currentTeam,
+            value: name,
             inline: true,
           },
           {
@@ -43,7 +44,7 @@ export class DiscordService {
           },
           {
             name: 'Team URL',
-            value: `[Team page](${teamLink})`,
+            value: `[Team page](${link})`,
             inline: true,
           },
         ];

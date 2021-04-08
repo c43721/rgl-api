@@ -1,8 +1,8 @@
-export interface BanTeamDetails {
+export interface TeamDetails {
   div: string;
-  currentTeam: string;
-  teamId: string;
-  teamLink: string;
+  name: string;
+  id: string;
+  link: string;
 }
 
 export interface Ban {
@@ -11,6 +11,6 @@ export interface Ban {
   name: string;
   link: string;
   expiresAt: Date;
-  teamDetails: BanTeamDetails | null;
+  teamDetails: TeamDetails | null;
   reason: string;
 }
