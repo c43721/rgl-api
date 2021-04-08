@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { load } from 'cheerio';
-import { Ban } from '../bans/bans.interface';
+import { Ban, TeamDetails } from '../bans/bans.interface';
 import { Ban as ProfileBan } from '../profile/profile.interface';
 import { Profile } from '../profile/profile.interface';
 import { RglPages } from './rgl.enum';
@@ -50,13 +50,13 @@ export class RglService {
           .attr('href')
           .split('=')[1];
 
-        let teamDetails = null;
+        let teamDetails: TeamDetails = null;
         if (div) {
           teamDetails = {
             div,
-            currentTeam: $($(element).find('td')[3]).text().trim(),
-            teamId: teamId,
-            teamLink: `${RglPages.TEAM_PAGE}${teamId}`,
+            name: $($(element).find('td')[3]).text().trim(),
+            id: teamId,
+            link: `${RglPages.TEAM_PAGE}${teamId}`,
           };
         }
 
