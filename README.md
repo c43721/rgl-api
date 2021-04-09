@@ -44,9 +44,9 @@ The `time` field is the amount of the the server took to respond to your request
             "expiresAt": Date,
             "teamDetails": null | {
                 "div": String,
-                "currentTeam": String,
-                "teamId": String,
-                "teamLink": String
+                "name": String,
+                "id": String,
+                "link": String
             },
             "reason": String
         ],
@@ -102,7 +102,7 @@ The `time` field is the amount of the the server took to respond to your request
             "joined": Date,
             "left": null | Date,
             "isCurrentTeam": Boolean,
-        }]
+        }],
     },
     "time": "0 ms"
 }
@@ -136,12 +136,11 @@ The `time` field is the amount of the the server took to respond to your request
 
         // Present on "previous" query, has all bans including current ban.
         "previous": [{
-                "reason": String,
-                "date": Date,
-                "expires": Date,
-                "isCurrentBan": Boolean
-            ]
-        },
+            "reason": String,
+            "date": Date,
+            "expires": Date,
+            "isCurrentBan": Boolean    
+        }],
     },
     "time": "0 ms"
 }

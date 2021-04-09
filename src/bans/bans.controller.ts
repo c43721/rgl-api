@@ -16,7 +16,7 @@ export class BansController {
   @Get('/latest')
   @UseInterceptors(TimeInterceptor)
   async index(
-    @Query('limit', new DefaultValuePipe(10), new ParseIntPipe())
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
     limit: number,
   ) {
     return this.bansService.getBans(limit);

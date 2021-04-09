@@ -1,15 +1,14 @@
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../rgl/rgl.service';
 import { CronNames } from '../enums/crons.enum';
-import { Caches } from '../enums/cache.enum';
 import { Ban } from './bans.interface';
 import { ConfigService } from '@nestjs/config';
 import { DiscordService } from 'src/discord/discord.service';
 import { Ban as BanClass, BanSchema } from './schemas/bans.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class BansService {
@@ -22,9 +21,9 @@ export class BansService {
     private schedulerRegistry: SchedulerRegistry,
     private discordService: DiscordService,
     private configService: ConfigService,
+    private cacheService: CacheService,
     @InjectModel(BanClass.name)
     private readonly banModel: Model<BanSchema>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async setStartingBan(): Promise<void> {
@@ -72,9 +71,7 @@ export class BansService {
     this.logger.log('Scraping bans page...');
     const bans = await this.rglService.getBans();
 
-    await this.cacheManager.set<Ban[]>(Caches.BAN_CACHE, bans, {
-      ttl: null,
-    });
+    await this.cacheService.setBanCache(bans);
 
     // Don't await this! It will still send the message
     // @TODO: Convert to use event-emitter instead?
@@ -131,36 +128,23 @@ export class BansService {
     return [];
   }
 
-  private async getCachedBans() {
-    const cachedBans = await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
-
-    if (!cachedBans) {
-      await this.scrapeBans();
-      return await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
-    }
-
-    return cachedBans;
-  }
-
-  getCron() {
+  get cron() {
     return this.schedulerRegistry.getCronJob(CronNames.CRON_BAN);
   }
 
   async getBans(limit: number = this.BAN_LIMIT) {
     let returnedBans: Ban[] | Ban = null;
 
-    const bans = await this.getCachedBans();
+    const bans = await this.cacheService.getBanCache() ?? await this.scrapeBans();
 
     limit > 1
       ? (returnedBans = bans.slice(0, limit))
       : (returnedBans = bans[0]);
 
-    const cron = this.getCron();
-
     return {
       bans: returnedBans,
-      nextScheduled: cron.nextDates().toDate(),
-      lastScheduled: cron.lastDate() || null,
+      nextScheduled: this.cron.nextDates().toDate(),
+      lastScheduled: this.cron.lastDate() || null,
     };
   }
 }

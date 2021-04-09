@@ -1,17 +1,12 @@
-import { CacheModule, HttpModule, Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
+import { CacheModule } from 'src/cache/cache.module';
 import { RglModule } from 'src/rgl/rgl.module';
 import { RglService } from 'src/rgl/rgl.service';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 
 @Module({
-  imports: [
-    RglModule,
-    HttpModule,
-    CacheModule.register({
-      ttl: 60 * 60 * 24, // 1 day
-    }),
-  ],
+  imports: [RglModule, HttpModule, CacheModule],
   providers: [RglService, ProfileService],
   controllers: [ProfileController],
 })

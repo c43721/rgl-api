@@ -21,12 +21,12 @@ export class ProfileController {
 
   @Get(':steamid')
   async index(
-    @Param('steamid', new SteamId64Pipe()) steamId: string,
+    @Param('steamid', SteamId64Pipe) steamId: string,
     @Query(new ValidationPipe({ transform: true }))
     { formats }: ProfileQueryDto,
   ) {
     const profile = await this.profileService.getProfile(steamId);
-    let { experience, ...rest } = profile;
+    let { experience, banHistory, ...rest } = profile;
 
     if (formats) {
       const newExperience = this.profileService.filterExperience(
@@ -41,10 +41,10 @@ export class ProfileController {
 
   @Get(':steamid/bans')
   async bans(
-    @Param('steamid', new SteamId64Pipe()) steamId: string,
-    @Query('details', new DefaultValuePipe(false), new ParseBoolPipe())
+    @Param('steamid', SteamId64Pipe) steamId: string,
+    @Query('details', new DefaultValuePipe(false), ParseBoolPipe)
     details: boolean,
-    @Query('previous', new DefaultValuePipe(false), new ParseBoolPipe())
+    @Query('previous', new DefaultValuePipe(false), ParseBoolPipe)
     previous: boolean,
   ) {
     return this.profileService.getProfileBans(steamId, details, previous);
