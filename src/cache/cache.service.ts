@@ -3,6 +3,7 @@ import { Cache } from 'cache-manager';
 import { Ban } from 'src/bans/bans.interface';
 import { Caches } from 'src/enums/cache.enum';
 import { Profile } from 'src/profile/profile.interface';
+import CacheTimes from './enums/cache-time.enum';
 
 @Injectable()
 export class CacheService {
@@ -21,6 +22,10 @@ export class CacheService {
   }
 
   async setProfileCache(steamId: string, profile: Profile) {
-    return await this.cacheManager.set(Caches.PROFILE_CACHE + steamId, profile);
+    return await this.cacheManager.set(
+      Caches.PROFILE_CACHE + steamId,
+      profile,
+      { ttl: CacheTimes.ONE_WEEEK },
+    );
   }
 }
