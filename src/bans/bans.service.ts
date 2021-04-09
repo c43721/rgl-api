@@ -21,7 +21,7 @@ export class BansService {
     private schedulerRegistry: SchedulerRegistry,
     private discordService: DiscordService,
     private configService: ConfigService,
-    private cacheManager: CacheService,
+    private cacheService: CacheService,
     @InjectModel(BanClass.name)
     private readonly banModel: Model<BanSchema>,
   ) {}
@@ -71,7 +71,7 @@ export class BansService {
     this.logger.log('Scraping bans page...');
     const bans = await this.rglService.getBans();
 
-    await this.cacheManager.setBanCache(bans);
+    await this.cacheService.setBanCache(bans);
 
     // Don't await this! It will still send the message
     // @TODO: Convert to use event-emitter instead?
@@ -135,7 +135,7 @@ export class BansService {
   async getBans(limit: number = this.BAN_LIMIT) {
     let returnedBans: Ban[] | Ban = null;
 
-    const bans = await this.cacheManager.getBanCache() ?? await this.scrapeBans();
+    const bans = await this.cacheService.getBanCache() ?? await this.scrapeBans();
 
     limit > 1
       ? (returnedBans = bans.slice(0, limit))
