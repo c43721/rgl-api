@@ -26,7 +26,7 @@ export class ProfileController {
     { formats }: ProfileQueryDto,
   ) {
     const profile = await this.profileService.getProfile(steamId);
-    let { experience, ...rest } = profile;
+    let { experience, banHistory, ...rest } = profile;
 
     if (formats) {
       const newExperience = this.profileService.filterExperience(

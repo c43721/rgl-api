@@ -2,6 +2,7 @@ import { Injectable, CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Ban } from 'src/bans/bans.interface';
 import { Caches } from 'src/enums/cache.enum';
+import { Profile } from 'src/profile/profile.interface';
 
 @Injectable()
 export class CacheService {
@@ -13,5 +14,13 @@ export class CacheService {
 
   async setBanCache(newBans: Ban[]) {
     return await this.cacheManager.set<Ban[]>(Caches.BAN_CACHE, newBans);
+  }
+
+  async getProfileCache(steamId: string): Promise<Profile | null> {
+    return await this.cacheManager.get(Caches.PROFILE_CACHE + steamId);
+  }
+
+  async setProfileCache(steamId: string, profile: Profile) {
+    return await this.cacheManager.set(Caches.PROFILE_CACHE + steamId, profile);
   }
 }
