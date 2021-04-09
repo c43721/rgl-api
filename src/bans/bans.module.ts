@@ -1,7 +1,8 @@
-import { CacheModule, HttpModule, Module, OnModuleInit } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { HttpModule, Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from 'src/cache/cache.module';
+import { CacheService } from 'src/cache/cache.service';
 import { DiscordModule } from 'src/discord/discord.module';
 import { RglService } from 'src/rgl/rgl.service';
 import { BansController } from './bans.controller';
@@ -12,9 +13,7 @@ import { BanSchema, Ban } from './schemas/bans.schema';
   imports: [
     MongooseModule.forFeature([{ name: Ban.name, schema: BanSchema }]),
     ScheduleModule.forRoot(),
-    CacheModule.register({
-      ttl: null,
-    }),
+    CacheModule,
     HttpModule,
     DiscordModule,
   ],

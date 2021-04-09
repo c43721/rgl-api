@@ -6,6 +6,7 @@ import { DiscordModule } from './discord/discord.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PuppeteerService } from './puppeteer/puppeteer.service';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PuppeteerService } from './puppeteer/puppeteer.service';
     HttpModule,
     ProfileModule,
     DiscordModule,
+    CacheModule,
   ],
   providers: [PuppeteerService],
 })
