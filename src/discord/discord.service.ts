@@ -39,8 +39,12 @@ export class DiscordService {
         {
           name: 'Expires',
           value: `${expirationMomentObject.format('MM-DD-YYYY')}${
-            expirationMomentObject.isAfter(moment()) &&
-            expirationMomentObject.isAfter(moment().add('5 years'))
+            expirationMomentObject.isBetween(
+              moment(),
+              moment().add(5, 'years'),
+              undefined,
+              '(]',
+            )
               ? ` (${expirationMomentObject.toNow(true)})`
               : ''
           }`,
