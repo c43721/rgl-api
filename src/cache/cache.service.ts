@@ -25,7 +25,7 @@ export class CacheService {
     return await this.cacheManager.set(
       Caches.PROFILE_CACHE + steamId,
       profile,
-      { ttl: CacheTimes.ONE_WEEEK },
+      { ttl: CacheTimes.ONE_WEEK },
     );
   }
 }
