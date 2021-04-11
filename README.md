@@ -11,7 +11,7 @@ The idea behind this project is to give developers a way to interact with the RG
 
 We also serve WebSocket gateways using **socket.io**. These gateways are meant to be used instead of making requests to endpoints on an interval, hopefully making it easier for a developer to know when an event has happened.
 
-Gateways will always have a namespace, and the URL would be `wss://{URL}/api/namespace`. Controllers may have a gateway, and those gateways may have several namespaces. Below are listed the controllers and namespaces with their descriptions and return values.
+Gateways will always have a namespace, and the URL would be `wss://{URL}/namespace`. Controllers may have a gateway, and those gateways may have several namespaces. Below are listed the controllers and namespaces with their descriptions and return values.
 
 ### Bans Gateway
 
@@ -43,13 +43,13 @@ This gateway will fire each time there's been a new batch of bans scraped in the
 
 `v1` is a pilot of this API, which will test out how people use this API and bugs that may occur. Expect changes, bugs, and features to be added.
 
-All routes are currently prefixed with `/api/v1/`. You will need to include this or else your request will fail. Also, requests will be cached for 1 day, so after the first request, the next requests will be served via the cache.
+All routes are currently prefixed with `/api/v1/`. You will need to include this or else your request will fail. Also, any relavent data will be returned in the `data` field. An example a response would look like:
 
-All relavent data will be posted in the `data` field. An example a response would look like:
-
-```json
+```js
 {
-  "data": [],
+  "data": {
+      // Response data here
+  },
   "time": "516 ms"
 }
 ```
@@ -95,12 +95,15 @@ The `time` field is the amount of the the server took to respond to your request
 
 ### Profile API
 
+All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached.
+
 ### `GET /profiles/:steamid`
 
 **Query fields:**
 | Name | Type | Description |
 |--|--|--|
 | formats | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
+| onlyActive | boolean | Only return "active" teams, which the user is currently playing or has not left |
 <br/>
 
 ```js
