@@ -53,7 +53,7 @@ export class BanEventListenerService implements OnModuleInit {
         `New starting ban: ${startingBan} -> ${banArray[0].steamId}`,
       );
 
-      // await this.banService.setNewStartingBan(banArray[0].steamId);
+      await this.banService.setNewStartingBan(banArray[0].steamId);
 
       this.events.newBans.next({ bans: banArray });
       return;
