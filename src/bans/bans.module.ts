@@ -7,6 +7,8 @@ import { BansController } from './bans.controller';
 import { BansService } from './services/bans.service';
 import { BanSchema, Ban } from './schemas/bans.schema';
 import { BanEventListenerService } from './services/ban-event-listener.service';
+import { BanGateway } from './gateways/ban.gateway';
+import { BanGatewayListenerService } from './services/ban-gateway-listener.service';
 
 @Module({
   imports: [
@@ -15,7 +17,14 @@ import { BanEventListenerService } from './services/ban-event-listener.service';
     CacheModule,
     HttpModule,
   ],
-  providers: [RglService, BansService, BanEventListenerService],
+  providers: [
+    RglService,
+    BansService,
+    BanEventListenerService,
+    BanGateway,
+    BanGatewayListenerService,
+  ],
+  exports: [BansService, BanEventListenerService, BanGatewayListenerService],
   controllers: [BansController],
 })
 export class BansModule implements OnModuleInit {
