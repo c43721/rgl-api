@@ -19,13 +19,18 @@ export class DiscordService {
     this.webhookUrl = this.configService.get('WEBHOOK_URL');
   }
 
-  async sendDiscordNotification(banArray: Ban[]) {
-    const [WEBHOOK_ID, WEBHOOK_TOKEN] = [
-      this.webhookUrl.split('/').slice(5)[0],
-      this.webhookUrl.split('/').slice(5)[1],
-    ];
+  private get webhookCredentials() {
+    return {
+      id: this.webhookUrl.split('/').slice(5)[0],
+      token: this.webhookUrl.split('/').slice(5)[1],
+    };
+  }
 
-    const webhookClient = new WebhookClient(WEBHOOK_ID, WEBHOOK_TOKEN);
+  async sendDiscordNotification(banArray: Ban[]) {
+    const webhookClient = new WebhookClient(
+      this.webhookCredentials.id,
+      this.webhookCredentials.token,
+    );
 
     for (const ban of banArray.reverse()) {
       const expirationMomentObject = moment(ban.expiresAt);
