@@ -43,13 +43,13 @@ This gateway will fire each time there's been a new batch of bans scraped in the
 
 `v1` is a pilot of this API, which will test out how people use this API and bugs that may occur. Expect changes, bugs, and features to be added.
 
-All routes are currently prefixed with `/api/v1/`. You will need to include this or else your request will fail. Also, requests will be cached for 1 day, so after the first request, the next requests will be served via the cache.
-
-All relavent data will be posted in the `data` field. An example a response would look like:
+All routes are currently prefixed with `/api/v1/`. You will need to include this or else your request will fail. Also, any relavent data will be returned in the `data` field. An example a response would look like:
 
 ```json
 {
-  "data": [],
+  "data": {
+      // Response data here
+  },
   "time": "516 ms"
 }
 ```
@@ -94,6 +94,8 @@ The `time` field is the amount of the the server took to respond to your request
 <br />
 
 ### Profile API
+
+All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached.
 
 ### `GET /profiles/:steamid`
 
