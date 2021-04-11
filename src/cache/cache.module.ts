@@ -10,7 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: async (configService: ConfigService) => ({
         store,
         max: 512,
-         ttl: null,
+        ttl: null,
         url: configService.get('REDIS_URL'),
       }),
       inject: [ConfigService],
