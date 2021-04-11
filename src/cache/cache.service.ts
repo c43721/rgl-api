@@ -1,9 +1,8 @@
 import { Injectable, CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Ban } from 'src/bans/bans.interface';
-import { Caches } from 'src/enums/cache.enum';
 import { Profile } from 'src/profile/profile.interface';
-import CacheTimes from './enums/cache-time.enum';
+import { CacheTimes, Caches } from './enums/cache.enum';
 
 @Injectable()
 export class CacheService {
