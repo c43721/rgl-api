@@ -85,10 +85,8 @@ export class BansService {
   async getBans(limit: number = this.BAN_LIMIT) {
     let returnedBans: Ban[] | Ban = null;
 
-    // const bans =
-    //   (await this.cacheService.getBanCache()) ?? (await this.scrapeBans());
-
-    const bans = await this.scrapeBans();
+    const bans =
+      (await this.cacheService.getBanCache()) ?? (await this.scrapeBans());
 
     limit > 1
       ? (returnedBans = bans.slice(0, limit))
