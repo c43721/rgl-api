@@ -11,7 +11,7 @@ The idea behind this project is to give developers a way to interact with the RG
 
 We also serve WebSocket gateways using **socket.io**. These gateways are meant to be used instead of making requests to endpoints on an interval, hopefully making it easier for a developer to know when an event has happened.
 
-Gateways will always have a namespace, and the URL would be `wss:{URL PROD}/api/namespace`. Controllers may have a gateway, and those gateways may have several namespaces. Below are listed the controllers and namespaces with their descriptions and return values.
+Gateways will always have a namespace, and the URL would be `wss://{URL}/api/namespace`. Controllers may have a gateway, and those gateways may have several namespaces. Below are listed the controllers and namespaces with their descriptions and return values.
 
 ### Bans Gateway
 
