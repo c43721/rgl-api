@@ -1,12 +1,10 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Events } from 'src/events/events';
 import { Ban } from '../bans.interface';
 import { BanGateway } from '../gateways/ban.gateway';
 
 @Injectable()
 export class BanGatewayListenerService implements OnModuleInit {
-  private logger = new Logger(BanGatewayListenerService.name);
-
   constructor(private events: Events, private banGateway: BanGateway) {}
 
   onModuleInit() {
