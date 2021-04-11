@@ -7,7 +7,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
-import { BansService } from './bans.service';
+import { BansService } from './services/bans.service';
 
 @Controller('bans')
 export class BansController {
