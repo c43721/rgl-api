@@ -10,11 +10,11 @@ export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async getBanCache(): Promise<Ban[] | null> {
-    return await this.cacheManager.get<Ban[]>(Caches.BAN_CACHE);
+    return await this.cacheManager.get(Caches.BAN_CACHE);
   }
 
   async setBanCache(newBans: Ban[]) {
-    return await this.cacheManager.set<Ban[]>(Caches.BAN_CACHE, newBans);
+    return await this.cacheManager.set(Caches.BAN_CACHE, newBans);
   }
 
   async getProfileCache(steamId: string): Promise<Profile | null> {
