@@ -7,6 +7,38 @@ This serves as the unofficial API for RGL, serving routes for getting a user's p
 
 The idea behind this project is to give developers a way to interact with the RGL page through an API, since one is not supported. We hope that providing a more open API will give better toolings to developers to create great projects.
 
+## Gateways
+
+We also serve WebSocket gateways using **socket.io**. These gateways are meant to be used instead of making requests to endpoints on an interval, hopefully making it easier for a developer to know when an event has happened.
+
+Gateways will always have a namespace, and the URL would be `wss://{URL}/api/namespace`. Controllers may have a gateway, and those gateways may have several namespaces. Below are listed the controllers and namespaces with their descriptions and return values.
+
+### Bans Gateway
+
+### `/bans`
+
+This gateway will fire each time there's been a new batch of bans scraped in the period. Connecting means it will subscribe your socket for events until you disconnect from the gateway.
+
+```js
+[{
+    "banId": String,
+    "steamId": String,
+    "name": String,
+    "link": String,
+    "expiresAt": Date,
+    "teamDetails": null | {
+        "div": String,
+        "name": String,
+        "id": String,
+        "link": String
+    },
+    "reason": String
+}],
+
+```
+
+**Note**: This returns an array of ban objects, you will be guarenteed there is at least 1 in the array.
+
 ## API (v1)
 
 `v1` is a pilot of this API, which will test out how people use this API and bugs that may occur. Expect changes, bugs, and features to be added.
@@ -139,7 +171,7 @@ The `time` field is the amount of the the server took to respond to your request
             "reason": String,
             "date": Date,
             "expires": Date,
-            "isCurrentBan": Boolean    
+            "isCurrentBan": Boolean
         }],
     },
     "time": "0 ms"
@@ -150,10 +182,9 @@ The `time` field is the amount of the the server took to respond to your request
 
 ## Enums
 
-|Name| Values |
-|--|--|
+| Name   | Values                                   |
+| ------ | ---------------------------------------- |
 | format | `sixes, highlander, prolander, nr6s, nr` |
-
 
 ## Issues, Questions
 

@@ -1,5 +1,4 @@
 import {
-  ClassSerializerInterceptor,
   Controller,
   DefaultValuePipe,
   Get,
@@ -23,17 +22,17 @@ export class ProfileController {
   async index(
     @Param('steamid', SteamId64Pipe) steamId: string,
     @Query(new ValidationPipe({ transform: true }))
-    { formats }: ProfileQueryDto,
+    { formats, onlyActive }: ProfileQueryDto,
   ) {
     const profile = await this.profileService.getProfile(steamId);
     let { experience, banHistory, ...rest } = profile;
 
     if (formats) {
-      const newExperience = this.profileService.filterExperience(
-        experience,
-        formats,
-      );
-      experience = newExperience;
+      experience = this.profileService.filterExperience(experience, formats);
+    }
+
+    if (onlyActive) {
+      experience = experience.filter(experience => experience.isCurrentTeam === true);
     }
 
     return { ...rest, experience };

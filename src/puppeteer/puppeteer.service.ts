@@ -73,6 +73,56 @@ export class PuppeteerService {
     await browser.close();
   }
 
+  async generateBulkBanScreenshots(banIds: string[]) {
+    const buffers: Buffer[] = [];
+
+    const { page, browser } = await this.createPage(RglPages.BAN_PAGE);
+
+    for (const id of banIds) {
+      const [button] = await page.$x(`//tr[@id=${id}]//td//span`);
+
+      await button.click();
+
+      await page.waitForTimeout(250);
+
+      const options = {
+        top: {
+          selector: `[data-target="#LFT-${id}"]`,
+          edge: 'top',
+        },
+        bottom: {
+          selector: `[data-target="#LFT-${id}"] + tr`,
+          edge: 'bottom',
+        },
+        left: {
+          selector: 'table',
+          edge: 'left',
+        },
+        right: {
+          selector: 'table',
+          edge: 'right',
+        },
+      };
+
+      const clipBounds = await this.generateClipBounds(options, page);
+
+      const screenshotBuffer = await page.screenshot({
+        clip: clipBounds,
+      });
+
+      buffers.push(screenshotBuffer as Buffer);
+    }
+
+    await this.closeBrowser(browser);
+
+    return buffers;
+  }
+
+  /**
+   * @deprecated Use bulk instead (no individual bans )
+   * @param banId The id of the ban to screenshot
+   * @returns {Promise<Buffer>} Screenshot
+   */
   async generateBanScreenshot(banId: string): Promise<Buffer> {
     const { page, browser } = await this.createPage(RglPages.BAN_PAGE);
 

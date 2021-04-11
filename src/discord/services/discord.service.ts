@@ -4,30 +4,26 @@ import { EmbedFieldData, MessageAttachment, WebhookClient } from 'discord.js';
 import * as moment from 'moment';
 import { Ban } from 'src/bans/bans.interface';
 import { Colors } from 'src/enums/colors.enum';
-import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
 
 @Injectable()
 export class DiscordService {
-  private webhookUrl: string;
+  private webhookClient: WebhookClient;
   private role: string;
 
-  constructor(
-    private configService: ConfigService,
-    private puppeteerService: PuppeteerService,
-  ) {
+  constructor(private configService: ConfigService) {
     this.role = this.configService.get('DISCORD_ROLE');
-    this.webhookUrl = this.configService.get('WEBHOOK_URL');
+
+    const webhookUrl = this.configService
+      .get('WEBHOOK_URL')
+      .split('/')
+      .slice(5);
+
+    this.webhookClient = new WebhookClient(webhookUrl[0], webhookUrl[1]);
   }
 
-  async sendDiscordNotification(banArray: Ban[]) {
-    const [WEBHOOK_ID, WEBHOOK_TOKEN] = [
-      this.webhookUrl.split('/').slice(5)[0],
-      this.webhookUrl.split('/').slice(5)[1],
-    ];
-
-    const webhookClient = new WebhookClient(WEBHOOK_ID, WEBHOOK_TOKEN);
-
-    for (const ban of banArray.reverse()) {
+  async sendDiscordNotification(banArray: Ban[], screenshots: Buffer[]) {
+    for (let i = banArray.length - 1; i >= 0; i--) {
+      const ban = banArray[i];
       const expirationMomentObject = moment(ban.expiresAt);
 
       const fields: EmbedFieldData[] = [
@@ -39,8 +35,12 @@ export class DiscordService {
         {
           name: 'Expires',
           value: `${expirationMomentObject.format('MM-DD-YYYY')}${
-            expirationMomentObject.isAfter(moment()) &&
-            expirationMomentObject.isAfter(moment().add('5 years'))
+            expirationMomentObject.isBetween(
+              moment(),
+              moment().add(5, 'years'),
+              undefined,
+              '(]',
+            )
               ? ` (${expirationMomentObject.toNow(true)})`
               : ''
           }`,
@@ -76,13 +76,12 @@ export class DiscordService {
         );
       }
 
-      // This is inefficient. I should recieve an array beforhand of screenshot elements, so I can re-use a puppeteer instance.
-      const screenshot = await this.puppeteerService.generateBanScreenshot(
-        ban.banId,
+      const discordAttachment = new MessageAttachment(
+        screenshots[i],
+        'ban.png',
       );
-      const discordAttachment = new MessageAttachment(screenshot, 'ban.png');
 
-      await webhookClient.send('', {
+      await this.webhookClient.send('', {
         files: [discordAttachment],
         embeds: [
           {
