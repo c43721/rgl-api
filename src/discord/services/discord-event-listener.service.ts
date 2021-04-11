@@ -1,17 +1,25 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Ban } from 'src/bans/bans.interface';
 import { Events } from 'src/events/events';
+import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
 import { DiscordService } from './discord.service';
 
 @Injectable()
 export class DiscordEventListenerService implements OnModuleInit {
-  constructor(private discordService: DiscordService, private events: Events) {}
+  constructor(
+    private discordService: DiscordService,
+    private puppeteerService: PuppeteerService,
+    private events: Events,
+  ) {}
 
   onModuleInit() {
     this.events.newBans.subscribe(({ bans }) => this.newBans(bans));
   }
 
   async newBans(bans: Ban[]) {
-    await this.discordService.sendDiscordNotification(bans);
+    const screenshots: Buffer[] = await this.puppeteerService.generateBulkBanScreenshots(
+      bans.map(ban => ban.banId),
+    );
+    await this.discordService.sendDiscordNotification(bans, screenshots);
   }
 }
