@@ -45,7 +45,7 @@ This gateway will fire each time there's been a new batch of bans scraped in the
 
 All routes are currently prefixed with `/api/v1/`. You will need to include this or else your request will fail. Also, any relavent data will be returned in the `data` field. An example a response would look like:
 
-```json
+```js
 {
   "data": {
       // Response data here
