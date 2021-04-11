@@ -1,4 +1,4 @@
-import { IsArray, IsOptional } from 'class-validator';
+import { IsArray, IsBooleanString, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 const Formats = {
@@ -18,4 +18,8 @@ export class ProfileQueryDto {
   @IsOptional()
   @Transform(({ value }) => value.split(',').map(transform))
   readonly formats: string[];
+
+  @IsBooleanString()
+  @IsOptional()
+  readonly onlyActive: boolean;
 }
