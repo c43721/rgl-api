@@ -7,29 +7,21 @@ import { Colors } from 'src/enums/colors.enum';
 
 @Injectable()
 export class DiscordService {
-  private webhookUrl: string;
+  private webhookClient: WebhookClient;
   private role: string;
 
-  constructor(
-    private configService: ConfigService,
-  ) {
+  constructor(private configService: ConfigService) {
     this.role = this.configService.get('DISCORD_ROLE');
-    this.webhookUrl = this.configService.get('WEBHOOK_URL');
-  }
 
-  private get webhookCredentials() {
-    return {
-      id: this.webhookUrl.split('/').slice(5)[0],
-      token: this.webhookUrl.split('/').slice(5)[1],
-    };
+    const webhookUrl = this.configService
+      .get('WEBHOOK_URL')
+      .split('/')
+      .slice(5);
+
+    this.webhookClient = new WebhookClient(webhookUrl[0], webhookUrl[1]);
   }
 
   async sendDiscordNotification(banArray: Ban[], screenshots: Buffer[]) {
-    const webhookClient = new WebhookClient(
-      this.webhookCredentials.id,
-      this.webhookCredentials.token,
-    );
-
     for (let i = banArray.length - 1; i >= 0; i--) {
       const ban = banArray[i];
       const expirationMomentObject = moment(ban.expiresAt);
@@ -84,9 +76,12 @@ export class DiscordService {
         );
       }
 
-      const discordAttachment = new MessageAttachment(screenshots[i], 'ban.png');
+      const discordAttachment = new MessageAttachment(
+        screenshots[i],
+        'ban.png',
+      );
 
-      await webhookClient.send('', {
+      await this.webhookClient.send('', {
         files: [discordAttachment],
         embeds: [
           {
