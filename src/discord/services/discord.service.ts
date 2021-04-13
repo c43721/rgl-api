@@ -42,13 +42,9 @@ export class DiscordService {
   }
 
   async sendDiscordEmbeds(bans: Ban[], buffers: Buffer[]) {
-    const embeds = this.createEmbedObjects(bans, buffers);
+    const embedObjects = this.createEmbedObjects(bans, buffers);
 
-    await Promise.all([
-      embeds.map(({ embed, file }) =>
-        this.sendDiscordNotification(embed, file),
-      ),
-    ]);
+    this.sendDiscordNotification(embedObjects);
   }
 
   private getTypeOfBan(ban: Ban): BanType {
@@ -126,8 +122,8 @@ export class DiscordService {
   private createEmbedObjects(
     banArray: Ban[],
     buffers: Buffer[],
-  ): EmbedObject[] {
-    const embedObjects = [];
+  ): MessageEmbed[] {
+    const embedObjects: MessageEmbed[] = [];
 
     for (let i = banArray.length - 1; i >= 0; i--) {
       const ban = banArray[i];
@@ -146,24 +142,16 @@ export class DiscordService {
         image: {
           url: `attachment://ban.png`,
         },
+        files: [discordAttachment],
       });
 
-      embedObjects.push({
-        file: discordAttachment,
-        embed,
-      });
+      embedObjects.push(embed);
     }
 
     return embedObjects;
   }
 
-  private async sendDiscordNotification(
-    embed: MessageEmbed,
-    file: MessageAttachment,
-  ) {
-    await this.webhookClient.send('', {
-      files: [file],
-      embeds: [embed],
-    });
+  private async sendDiscordNotification(embeds: MessageEmbed[]) {
+    await this.webhookClient.send('', { embeds });
   }
 }
