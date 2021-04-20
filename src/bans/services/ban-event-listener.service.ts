@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Events } from 'src/events/events';
 import { Ban } from '../bans.interface';
-import { BansService } from './bans.service';
 
 @Injectable()
 export class BanEventListenerService implements OnModuleInit {
@@ -15,7 +14,7 @@ export class BanEventListenerService implements OnModuleInit {
     );
   }
 
-  async checkBans(banArray: Ban[], startingBan: string) {
+  private checkBans(banArray: Ban[], startingBan: string) {
     this.logger.log('Checking for new banned players...');
 
     for (let i = 0; i < banArray.length; i++) {
@@ -34,8 +33,7 @@ export class BanEventListenerService implements OnModuleInit {
           `New starting ban: ${startingBan} -> ${newBansArray[0].steamId}`,
         );
 
-        this.events.newBans.next({ bans: newBansArray });
-        return;
+        return this.events.newBans.next({ bans: newBansArray });
       }
     }
 
@@ -52,8 +50,7 @@ export class BanEventListenerService implements OnModuleInit {
         `New starting ban: ${startingBan} -> ${banArray[0].steamId}`,
       );
 
-      this.events.newBans.next({ bans: banArray });
-      return;
+      return this.events.newBans.next({ bans: banArray });
     }
 
     this.logger.log('No new bans');

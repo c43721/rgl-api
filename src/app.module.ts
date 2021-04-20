@@ -23,6 +23,7 @@ import validationSchema from './config-validation';
         uri: configService.get<string>('MONGO_URI'),
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useFindAndModify: true,
       }),
       inject: [ConfigService],
     }),

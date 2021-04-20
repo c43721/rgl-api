@@ -1,7 +1,6 @@
 import { forwardRef, Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BansModule } from 'src/bans/bans.module';
-import { Events } from 'src/events/events';
 import { Configuration, ConfigurationSchema } from './schemas/startup.schema';
 import { StartupService } from './services/startup.service';
 
@@ -12,7 +11,7 @@ import { StartupService } from './services/startup.service';
     ]),
     forwardRef(() => BansModule),
   ],
-  providers: [StartupService, Events],
+  providers: [StartupService],
   exports: [StartupService],
 })
 export class StartupModule implements OnModuleInit {

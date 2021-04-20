@@ -27,7 +27,7 @@ export class StartupService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.events.newBans.subscribe(({ bans }) =>
+    this.events.parseBanScrape.subscribe(({ bans }) =>
       this.setNewStartingBan(bans[0].steamId),
     );
   }
@@ -37,7 +37,9 @@ export class StartupService implements OnModuleInit {
   }
 
   private async setNewStartingBan(steamId: string): Promise<void> {
-    await this.startupSchema.updateOne({}, { startingBan: steamId });
+    await this.startupSchema.findOneAndUpdate({}, { startingBan: steamId });
+    this.STARTING_BAN = steamId;
+    this.logger.debug('Successfully set new starting ban.');
   }
 
   private async createConfiguration(startingBan: string) {

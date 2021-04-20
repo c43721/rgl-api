@@ -6,6 +6,7 @@ import { Ban } from '../bans.interface';
 import { CacheService } from 'src/cache/cache.service';
 import { Events } from 'src/events/events';
 import { StartupService } from 'src/startup/services/startup.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BansService {
@@ -14,6 +15,7 @@ export class BansService {
   constructor(
     private rglService: RglService,
     private schedulerRegistry: SchedulerRegistry,
+    private configService: ConfigService,
     private cacheService: CacheService,
     @Inject(forwardRef(() => StartupService))
     private startupService: StartupService,
@@ -50,8 +52,11 @@ export class BansService {
   async getBans(limit: number = 10) {
     let returnedBans: Ban[] | Ban = null;
 
-    const bans =
-      (await this.cacheService.getBanCache()) ?? (await this.scrapeBans());
+    const isDebugEnabled = this.configService.get<boolean>('DEBUG');
+
+    const bans = isDebugEnabled
+      ? await this.scrapeBans()
+      : (await this.cacheService.getBanCache()) ?? (await this.scrapeBans());
 
     limit > 1
       ? (returnedBans = bans.slice(0, Math.min(limit, 10)))
