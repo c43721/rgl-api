@@ -7,7 +7,7 @@ import { BansService } from './bans.service';
 export class BanEventListenerService implements OnModuleInit {
   private logger = new Logger(BanEventListenerService.name);
 
-  constructor(private banService: BansService, private events: Events) {}
+  constructor(private events: Events) {}
 
   onModuleInit() {
     this.events.parseBanScrape.subscribe(({ bans, startingBan }) =>
@@ -34,7 +34,6 @@ export class BanEventListenerService implements OnModuleInit {
           `New starting ban: ${startingBan} -> ${newBansArray[0].steamId}`,
         );
 
-        await this.banService.setNewStartingBan(newBansArray[0].steamId);
         this.events.newBans.next({ bans: newBansArray });
         return;
       }
@@ -52,8 +51,6 @@ export class BanEventListenerService implements OnModuleInit {
       this.logger.verbose(
         `New starting ban: ${startingBan} -> ${banArray[0].steamId}`,
       );
-
-      await this.banService.setNewStartingBan(banArray[0].steamId);
 
       this.events.newBans.next({ bans: banArray });
       return;
