@@ -27,7 +27,7 @@ export class StartupService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.events.parseBanScrape.subscribe(({ bans }) =>
+    this.events.newBans.subscribe(({ bans }) =>
       this.setNewStartingBan(bans[0].steamId),
     );
   }
