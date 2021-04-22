@@ -5,7 +5,7 @@ import {
   launch as launchBrowser,
   Browser,
 } from 'puppeteer';
-import { RglPages } from 'src/rgl/rgl.enum';
+import { RglPages } from 'src/rgl/enums/rgl.enum';
 
 @Injectable()
 export class PuppeteerService {

@@ -8,7 +8,7 @@ import { load } from 'cheerio';
 import { Ban, TeamDetails } from '../bans/bans.interface';
 import { ProfileBan, Profile } from '../profile/profile.interface';
 import { RglProfileNotFound } from './exceptions/RglProfileNotFound.exception';
-import { RglPages } from './rgl.enum';
+import { RglPages } from './enums/rgl.enum';
 import ProfileHelper from './rgl.helper';
 
 @Injectable()
