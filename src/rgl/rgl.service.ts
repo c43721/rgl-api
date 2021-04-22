@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { load } from 'cheerio';
 import { Ban, TeamDetails } from '../bans/bans.interface';
-import { Ban as ProfileBan } from '../profile/profile.interface';
-import { Profile } from '../profile/profile.interface';
+import { ProfileBan, Profile } from '../profile/profile.interface';
+import { RglProfileNotFound } from './exceptions/RglProfileNotFound.exception';
 import { RglPages } from './rgl.enum';
 import ProfileHelper from './rgl.helper';
 
@@ -94,7 +94,7 @@ export class RglService {
 
     const $ = load(profilePage);
     const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
-    if (!!hasProfile) throw new NotFoundException(steamId, hasProfile);
+    if (!!hasProfile) throw new RglProfileNotFound(steamId, hasProfile);
 
     const trophiesRaw = $(ProfileHelper.player.trophies).text().split(/\s+/);
 
