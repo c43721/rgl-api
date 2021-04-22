@@ -37,7 +37,12 @@ export class StartupService implements OnModuleInit {
   }
 
   private async setNewStartingBan(steamId: string): Promise<void> {
-    await this.startupSchema.findOneAndUpdate({}, { startingBan: steamId });
+    try {
+      await this.startupSchema.findOneAndUpdate({}, { startingBan: steamId });
+    } catch (err) {
+      this.STARTING_BAN = steamId;
+      return this.logger.error(`Could not save steamId (${steamId}) to MongoDB.`);
+    }
     this.STARTING_BAN = steamId;
     this.logger.debug('Successfully set new starting ban.');
   }
