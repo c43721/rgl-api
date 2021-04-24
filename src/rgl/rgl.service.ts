@@ -2,12 +2,11 @@ import {
   HttpService,
   Injectable,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { load } from 'cheerio';
 import { Ban, TeamDetails } from '../bans/bans.interface';
 import { ProfileBan, Profile } from '../profile/profile.interface';
-import { RglProfileNotFound } from './exceptions/RglProfileNotFound.exception';
+import ProfileNotFoundException from './exceptions/ProfileNotFoundException';
 import { RglPages } from './enums/rgl.enum';
 import ProfileHelper from './rgl.helper';
 
@@ -94,7 +93,7 @@ export class RglService {
 
     const $ = load(profilePage);
     const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
-    if (!!hasProfile) throw new RglProfileNotFound(steamId, hasProfile);
+    if (!!hasProfile) throw new ProfileNotFoundException(steamId, hasProfile);
 
     const trophiesRaw = $(ProfileHelper.player.trophies).text().split(/\s+/);
 
@@ -184,10 +183,10 @@ export class RglService {
     banElementArray.each(function (_i, _element) {
       const banRow = $(this);
       allBans.push({
-        reason: $($(banRow).find('td')[4]).text().trim(),
-        date: new Date($($(banRow).find('td')[2]).text().trim()),
-        expires: new Date($($(banRow).find('td')[3]).text().trim()),
-        isCurrentBan: !!$(banRow).attr('style').trim(),
+        reason: $(banRow.find('td')[4]).text().trim(),
+        date: new Date($(banRow.find('td')[2]).text().trim()),
+        expires: new Date($(banRow.find('td')[3]).text().trim()),
+        isCurrentBan: !!banRow.attr('style').trim(),
       });
     });
 

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class RglProfileNotFound extends HttpException {
+export default class ProfileNotFoundException extends HttpException {
   constructor(steamId: string, message: string = 'Profile not found') {
     super(
       HttpException.createBody({ data: { statusCode: 200, steamId, message } }),
