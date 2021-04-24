@@ -4,7 +4,7 @@ export class RglProfileNotFound extends HttpException {
   constructor(steamId: string, message: string = 'Profile not found') {
     super(
       HttpException.createBody({ data: { statusCode: 200, steamId, message } }),
-      HttpStatus.OK,
+      HttpStatus.NOT_FOUND,
     );
   }
 }
