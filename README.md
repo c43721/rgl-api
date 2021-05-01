@@ -1,11 +1,14 @@
-<p align="center">bans.payload.tf</p>
-<p align="center">The unofficial API for RGL.gg</p>
+<h1 align="center">bans.payload.tf</h1>
+
+<p align="center">The unofficial robust API for RGL</p>
 
 # Description
 
 This serves as the unofficial API for RGL, serving routes for getting a user's profile, ban history, or getting the most recent bans.
 
 The idea behind this project is to give developers a way to interact with the RGL page through an API, since one is not supported. We hope that providing a more open API will give better toolings to developers to create great projects.
+
+This is by far the most efficient, feature-rich and stable API for RGL. Releases will focus on bringing faster response times, easier and more specific routes, as well as improved stability and availability. Our goal is to build a robust API that is highly available, scalable, and efficient in time and memory.
 
 # Gateways
 
@@ -218,6 +221,10 @@ Any issues or questions should be posted on GitHub issues, where they can be mor
 # Support this Project
 
 You may back me on my [Patreon](https://www.patreon.com/c43721). Direct sponsorship of this project can be discussed on Discord (24#7644) or by another medium.
+
+# Contributing
+
+Before contributing, please make sure no one else has stated against your proposal. Otherwise, make a Pull Request detailing your proposal and any relevant code changes. If you are committing code, try to create test cases, as going foward we'd like to have stable tests.
 
 # License
 
