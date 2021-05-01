@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Ban } from 'src/bans/bans.interface';
+import { Ban } from 'src/bans/interfaces/bans.interface';
 import { Events } from 'src/events/events';
 import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
 import { DiscordService } from './discord.service';

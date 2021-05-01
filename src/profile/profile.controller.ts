@@ -32,7 +32,9 @@ export class ProfileController {
     }
 
     if (onlyActive) {
-      experience = experience.filter(experience => experience.isCurrentTeam === true);
+      experience = experience.filter(
+        experience => experience.isCurrentTeam === true,
+      );
     }
 
     return { ...rest, experience };

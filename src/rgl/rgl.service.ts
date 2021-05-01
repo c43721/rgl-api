@@ -1,6 +1,6 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
-import { Ban, TeamDetails } from '../bans/bans.interface';
+import { Ban, TeamDetails } from '../bans/interfaces/bans.interface';
 import { ProfileBan, Profile } from '../profile/profile.interface';
 import ProfileNotFoundException from './exceptions/ProfileNotFoundException';
 import { RglPages } from './enums/rgl.enum';
@@ -39,7 +39,7 @@ export class RglService {
       // This is necessary, since each "block" of user/reasons are separated by tr's
       if (index % 2 !== 0) return reasons.push(currentElement.text().trim());
 
-      const banId =currentElement.attr('id');
+      const banId = currentElement.attr('id');
       const steamid = $(currentElement.find('td')[0]).text().trim();
       const div = $(currentElement.find('td')[2]).text().trim() ?? null;
       const teamId = $(currentElement.find('td')[3])

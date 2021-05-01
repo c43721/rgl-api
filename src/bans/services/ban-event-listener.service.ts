@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Events } from 'src/events/events';
-import { Ban } from '../bans.interface';
+import { Ban } from '../interfaces/bans.interface';
 
 @Injectable()
 export class BanEventListenerService implements OnModuleInit {

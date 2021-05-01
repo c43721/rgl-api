@@ -5,31 +5,20 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { Subject } from 'rxjs';
+import { BanGatewayRoom } from '../interfaces/bans-gateway.interface';
 
 @WebSocketGateway({
   namespace: 'bans',
 })
 export class BanGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  private _subscriber = new Subject<Socket>();
-  private _unsubscribers = new Subject<Socket>();
-
   @WebSocketServer()
   server: Server;
 
-  get subscribers() {
-    return this._subscriber.asObservable();
-  }
-
-  get unsubscribers() {
-    return this._unsubscribers.asObservable();
-  }
-
   handleConnection(socket: Socket) {
-    this._subscriber.next(socket);
+    socket.join(BanGatewayRoom.NEW_BAN_NOTIFICATION);
   }
 
   handleDisconnect(socket: Socket) {
-    this._unsubscribers.next(socket);
+    socket.leave(BanGatewayRoom.NEW_BAN_NOTIFICATION);
   }
 }

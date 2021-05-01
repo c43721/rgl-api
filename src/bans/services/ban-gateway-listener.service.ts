@@ -1,7 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Events } from 'src/events/events';
-import { Ban } from '../bans.interface';
+import { Ban } from '../interfaces/bans.interface';
 import { BanGateway } from '../gateways/ban.gateway';
+import {
+  BanGatewayEvent,
+  BanGatewayRoom,
+} from '../interfaces/bans-gateway.interface';
 
 @Injectable()
 export class BanGatewayListenerService implements OnModuleInit {
@@ -9,15 +13,11 @@ export class BanGatewayListenerService implements OnModuleInit {
 
   onModuleInit() {
     this.events.newBans.subscribe(({ bans }) => this.notifyListeners(bans));
-    this.banGateway.subscribers.subscribe(socket => {
-      socket.join('ban-notifications-room');
-    });
-    this.banGateway.unsubscribers.subscribe(socket => {
-      socket.leave('ban-notifications-room');
-    });
   }
 
   async notifyListeners(bans: Ban[]) {
-    this.banGateway.server.to('ban-notifications-room').emit('new-bans', bans);
+    this.banGateway.server
+      .to(BanGatewayRoom.NEW_BAN_NOTIFICATION)
+      .emit(BanGatewayEvent.NEW_BANS, bans);
   }
 }
