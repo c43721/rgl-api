@@ -1,13 +1,8 @@
-import {
-  HttpService,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
-import { Ban, TeamDetails } from '../bans/bans.interface';
+import { Ban, TeamDetails } from '../bans/interfaces/bans.interface';
 import { ProfileBan, Profile } from '../profile/profile.interface';
-import { RglProfileNotFound } from './exceptions/RglProfileNotFound.exception';
+import ProfileNotFoundException from './exceptions/ProfileNotFoundException';
 import { RglPages } from './enums/rgl.enum';
 import ProfileHelper from './rgl.helper';
 
@@ -40,39 +35,38 @@ export class RglService {
     const reasons = [];
 
     $('tbody > tr').each((index, element) => {
+      const currentElement = $(element);
       // This is necessary, since each "block" of user/reasons are separated by tr's
-      if (index % 2 === 0) {
-        const banId = $(element).attr('id');
-        const steamid = $($(element).find('td')[0]).text().trim();
-        const div = $($(element).find('td')[2]).text().trim() ?? null;
-        const teamId = $($(element).find('td')[3])
-          .find('a')
-          .attr('href')
-          .split('=')[1];
+      if (index % 2 !== 0) return reasons.push(currentElement.text().trim());
 
-        let teamDetails: TeamDetails = null;
-        if (div) {
-          teamDetails = {
-            div,
-            name: $($(element).find('td')[3]).text().trim(),
-            id: teamId,
-            link: `${RglPages.TEAM_PAGE}${teamId}`,
-          };
-        }
+      const banId = currentElement.attr('id');
+      const steamid = $(currentElement.find('td')[0]).text().trim();
+      const div = $(currentElement.find('td')[2]).text().trim() ?? null;
+      const teamId = $(currentElement.find('td')[3])
+        .find('a')
+        .attr('href')
+        .split('=')[1];
 
-        const expiresAtString = $($(element).find('td')[4]).text().trim();
-
-        players.push({
-          banId,
-          steamId: steamid,
-          name: $($(element).find('td')[1]).text().trim(),
-          link: `${RglPages.PROFILE_PAGE}${steamid}`,
-          expiresAt: new Date(expiresAtString),
-          teamDetails,
-        });
-      } else {
-        reasons.push($(element).text().trim());
+      let teamDetails: TeamDetails = null;
+      if (div) {
+        teamDetails = {
+          div,
+          name: $(currentElement.find('td')[3]).text().trim(),
+          id: teamId,
+          link: `${RglPages.TEAM_PAGE}${teamId}`,
+        };
       }
+
+      const expiresAtString = $(currentElement.find('td')[4]).text().trim();
+
+      players.push({
+        banId,
+        steamId: steamid,
+        name: $(currentElement.find('td')[1]).text().trim(),
+        link: `${RglPages.PROFILE_PAGE}${steamid}`,
+        expiresAt: new Date(expiresAtString),
+        teamDetails,
+      });
     });
 
     const playerWithReason = players.map(
@@ -94,7 +88,7 @@ export class RglService {
 
     const $ = load(profilePage);
     const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
-    if (!!hasProfile) throw new RglProfileNotFound(steamId, hasProfile);
+    if (!!hasProfile) throw new ProfileNotFoundException(steamId, hasProfile);
 
     const trophiesRaw = $(ProfileHelper.player.trophies).text().split(/\s+/);
 
@@ -144,10 +138,10 @@ export class RglService {
         .map((i, elem) => $(elem).text().trim());
       const recordsWith = $tables
         .find(ProfileHelper.player.leagueTable.recordWith)
-        .map((i, elem) => $(elem).text().trim());
+        .map((i, elem) => $(elem).text().trim().slice(1, -1));
       const recordsWithout = $tables
         .find(ProfileHelper.player.leagueTable.recordWithout)
-        .map((i, elem) => $(elem).text().trim());
+        .map((i, elem) => $(elem).text().trim().slice(1, -1));
       const amountsWon = $tables
         .find(ProfileHelper.player.leagueTable.amountWon)
         .map((i, elem) => $(elem).text().trim());
@@ -184,10 +178,10 @@ export class RglService {
     banElementArray.each(function (_i, _element) {
       const banRow = $(this);
       allBans.push({
-        reason: $($(banRow).find('td')[4]).text().trim(),
-        date: new Date($($(banRow).find('td')[2]).text().trim()),
-        expires: new Date($($(banRow).find('td')[3]).text().trim()),
-        isCurrentBan: !!$(banRow).attr('style').trim(),
+        reason: $(banRow.find('td')[4]).text().trim(),
+        date: new Date($(banRow.find('td')[2]).text().trim()),
+        expires: new Date($(banRow.find('td')[3]).text().trim()),
+        isCurrentBan: !!banRow.attr('style').trim(),
       });
     });
 

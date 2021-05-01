@@ -7,7 +7,7 @@ import {
   WebhookClient,
 } from 'discord.js';
 import * as moment from 'moment';
-import { Ban } from 'src/bans/bans.interface';
+import { Ban } from 'src/bans/interfaces/bans.interface';
 import { Colors } from 'src/enums/colors.enum';
 
 enum BanTypes {

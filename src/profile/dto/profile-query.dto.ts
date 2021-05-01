@@ -6,7 +6,7 @@ const Formats = {
   highlander: 'hl',
   prolander: 'pl',
   nr6s: 'nr',
-  nr: 'nr'
+  nr: 'nr',
 } as const;
 
 function transform(toConvert: string) {

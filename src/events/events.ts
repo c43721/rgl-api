@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { Ban } from 'src/bans/bans.interface';
+import { Ban } from 'src/bans/interfaces/bans.interface';
 
 @Injectable()
 export class Events {
