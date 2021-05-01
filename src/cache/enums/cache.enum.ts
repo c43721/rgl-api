@@ -1,4 +1,4 @@
-const ONE_HOUR_MS = 3600000;
+const ONE_HOUR_SECONDS = 3600;
 
 export enum Caches {
   BAN_CACHE = 'LATEST_RGL_BANS',
@@ -6,7 +6,7 @@ export enum Caches {
 }
 
 export enum CacheTimes {
-  ONE_HOUR = ONE_HOUR_MS,
-  ONE_DAY = ONE_HOUR_MS * 24,
-  ONE_WEEK = ONE_HOUR_MS * 24 * 7,
+  ONE_HOUR = ONE_HOUR_SECONDS,
+  ONE_DAY = ONE_HOUR_SECONDS * 24,
+  ONE_WEEK = ONE_HOUR_SECONDS * 24 * 7,
 }
