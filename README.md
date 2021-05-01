@@ -64,14 +64,28 @@ All routes are currently prefixed with `/api/v1/`. You will need to include this
 
 The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64`.
 
+Custom errors will be responded with the `data` object as well. This may be subject to change, but is in place for consistancy for now.
+Example:
+
+```js
+{
+    "data": {
+        "statusCode": 404,
+        "message": "Error message",
+        "error": "Error"
+    }
+}
+```
+
 ## Bans API
 
-### `GET /bans/latest`
+### GET `/bans/latest`
 
 **Query fields:**
 | Name | Type | Description |
 |--|--|--|
 | limit | number | Limit amount of returned bans |
+<br />
 
 ```js
 {
@@ -105,7 +119,7 @@ The `time` field is the amount of the the server took to respond to your request
 
 All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached.
 
-### `GET /profiles/:steamid`
+### GET `/profiles/:steamid`
 
 **Query fields:**
 | Name | Type | Description |
@@ -153,7 +167,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 
 <br />
 
-### `GET /profiles/:steamid/bans`
+### GET `/profiles/:steamid/bans`
 
 **Query fields:**
 | Name | Type | Description |
