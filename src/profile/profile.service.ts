@@ -10,7 +10,9 @@ export class ProfileService {
     private cacheService: CacheService,
   ) {}
 
-  async getProfile(steamId: string) {
+  async getProfile(steamId: string, disableCache: boolean = false) {
+    if (disableCache) return await this.rglService.getProfile(steamId);
+    
     const cachedProfile = await this.cacheService.getProfileCache(steamId);
 
     if (!cachedProfile) {

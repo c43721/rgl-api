@@ -40,6 +40,32 @@ export class ProfileController {
     return { ...rest, experience };
   }
 
+  /**
+   * Hotfix for bypassing cache.
+   * Remove please sometime when I fix this...
+   */
+  @Get(':steamid/cache-bypass')
+  async disableCache(
+    @Param('steamid', SteamId64Pipe) steamId: string,
+    @Query(new ValidationPipe({ transform: true }))
+    { formats, onlyActive }: ProfileQueryDto,
+  ) {
+    const profile = await this.profileService.getProfile(steamId, true);
+    let { experience, banHistory, ...rest } = profile;
+
+    if (formats) {
+      experience = this.profileService.filterExperience(experience, formats);
+    }
+
+    if (onlyActive) {
+      experience = experience.filter(
+        experience => experience.isCurrentTeam === true,
+      );
+    }
+
+    return { ...rest, experience };
+  }
+
   @Get(':steamid/bans')
   async bans(
     @Param('steamid', SteamId64Pipe) steamId: string,
