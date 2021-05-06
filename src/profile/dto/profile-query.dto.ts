@@ -24,7 +24,7 @@ export class ProfileQueryDto {
   @IsArray()
   @IsOptional()
   @Transform(({ value }) => value.split(',').map(transform))
-    /**
+  /**
    * Filter for formats or 'gamemodes'
    */
   readonly formats: string[];
