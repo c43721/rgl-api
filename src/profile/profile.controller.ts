@@ -10,8 +10,6 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { from } from 'rxjs';
-import { distinct } from 'rxjs/operators';
 import { TimeInterceptor } from 'src/lib/interceptors/timer.interceptor';
 import { SteamId64Pipe } from 'src/lib/pipes/steamid.pipe';
 import { BulkProfileQueryDto, ProfileQueryDto } from './dto/profile-query.dto';
