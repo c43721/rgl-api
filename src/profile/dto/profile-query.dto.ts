@@ -24,10 +24,16 @@ export class ProfileQueryDto {
   @IsArray()
   @IsOptional()
   @Transform(({ value }) => value.split(',').map(transform))
+    /**
+   * Filter for formats or 'gamemodes'
+   */
   readonly formats: string[];
 
   @IsBooleanString()
   @IsOptional()
+  /**
+   * Filter for active teams
+   */
   readonly onlyActive: boolean;
 }
 
@@ -35,6 +41,11 @@ export class BulkProfileQueryDto extends ProfileQueryDto {
   @IsNotEmpty()
   @IsArray()
   @IsSteamIdArray()
-  @Transform(({ value }) => value.map((v: string) => new SteamID(v).getSteamID64()))
+  @Transform(({ value }) =>
+    value.map((v: string) => new SteamID(v).getSteamID64()),
+  )
+  /**
+   * Profiles in SteamID64 format
+   */
   readonly profiles: string[];
 }
