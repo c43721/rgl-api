@@ -6,7 +6,7 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
+import { TimeInterceptor } from 'src/lib/interceptors/timer.interceptor';
 import { BansService } from './services/bans.service';
 
 @Controller('bans')

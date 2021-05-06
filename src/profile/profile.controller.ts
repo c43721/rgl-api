@@ -1,22 +1,33 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
   Param,
   ParseBoolPipe,
+  Post,
   Query,
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { TimeInterceptor } from 'src/interceptors/timer.interceptor';
-import { SteamId64Pipe } from 'src/pipes/steamid.pipe';
-import { ProfileQueryDto } from './dto/profile-query.dto';
+import { TimeInterceptor } from 'src/lib/interceptors/timer.interceptor';
+import { SteamId64Pipe } from 'src/lib/pipes/steamid.pipe';
+import { BulkProfileQueryDto, ProfileQueryDto } from './dto/profile-query.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profiles')
 @UseInterceptors(TimeInterceptor)
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
+
+  @Post('/bulk')
+  async bulkProfiles(
+    @Body(new ValidationPipe({ transform: true }))
+    body: BulkProfileQueryDto,
+  ) {
+    const { profiles } = body;
+    return profiles.map(p => p);
+  }
 
   @Get(':steamid')
   async index(

@@ -1,5 +1,12 @@
-import { IsArray, IsBooleanString, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsBooleanString,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
+import { IsSteamIdArray } from 'src/lib/validators/steamid.validator';
+import * as SteamID from 'steamid';
 
 const Formats = {
   sixes: 'sixes', // This consistancy is amazing!!! not.
@@ -22,4 +29,12 @@ export class ProfileQueryDto {
   @IsBooleanString()
   @IsOptional()
   readonly onlyActive: boolean;
+}
+
+export class BulkProfileQueryDto extends ProfileQueryDto {
+  @IsNotEmpty()
+  @IsArray()
+  @IsSteamIdArray()
+  @Transform(({ value }) => value.map((v: string) => new SteamID(v).getSteamID64()))
+  readonly profiles: string[];
 }
