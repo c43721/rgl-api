@@ -10,13 +10,36 @@ export class ProfileService {
     private cacheService: CacheService,
   ) {}
 
-  async getBulkProfiles(steamIdArray: string[]) {
-    return await this.rglService.getBulkProfiles(steamIdArray);
+  async getBulkProfiles(
+    steamIdArray: string[],
+    formats: string[],
+    onlyActive: boolean,
+  ) {
+    const bulkProfiles = await this.rglService.getBulkProfiles(steamIdArray);
+
+    return bulkProfiles.map(profile => {
+      // Hacky, but worth.
+      if ((profile as any).message) return profile;
+
+      let { experience, banHistory, ...rest } = profile;
+
+      if (formats) {
+        experience = this.filterExperience(experience, formats);
+      }
+
+      if (onlyActive) {
+        experience = experience.filter(
+          experience => experience.isCurrentTeam === true,
+        );
+      }
+
+      return { ...rest, experience };
+    });
   }
 
   async getProfile(steamId: string, disableCache: boolean = false) {
     if (disableCache) return await this.rglService.getProfile(steamId);
-    
+
     const cachedProfile = await this.cacheService.getProfileCache(steamId);
 
     if (!cachedProfile) {

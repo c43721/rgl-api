@@ -26,7 +26,7 @@ export class ProfileController {
     { profiles, formats, onlyActive }: BulkProfileQueryDto,
   ) {
     const distinctProfiles = [...new Set(profiles)];
-    return this.profileService.getBulkProfiles(distinctProfiles);
+    return this.profileService.getBulkProfiles(distinctProfiles, formats, onlyActive);
   }
 
   @Get(':steamid')
