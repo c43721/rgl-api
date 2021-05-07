@@ -9,6 +9,7 @@ import { BanGateway } from './gateways/ban.gateway';
 import { BanGatewayListenerService } from './services/ban-gateway-listener.service';
 import { StartupModule } from 'src/startup/startup.module';
 import { forwardRef } from '@nestjs/common';
+import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { forwardRef } from '@nestjs/common';
     forwardRef(() => StartupModule),
   ],
   providers: [
+    PuppeteerService,
     RglService,
     BansService,
     BanEventListenerService,

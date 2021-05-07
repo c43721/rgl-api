@@ -10,6 +10,10 @@ export class ProfileService {
     private cacheService: CacheService,
   ) {}
 
+  async getBulkProfiles(steamIdArray: string[]) {
+    return await this.rglService.getBulkProfiles(steamIdArray);
+  }
+
   async getProfile(steamId: string, disableCache: boolean = false) {
     if (disableCache) return await this.rglService.getProfile(steamId);
     

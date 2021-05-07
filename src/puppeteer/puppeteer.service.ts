@@ -5,6 +5,7 @@ import {
   launch as launchBrowser,
   Browser,
 } from 'puppeteer';
+import { Cluster } from 'puppeteer-cluster';
 import { RglPages } from 'src/rgl/enums/rgl.enum';
 
 @Injectable()
@@ -116,5 +117,37 @@ export class PuppeteerService {
     await this.closeBrowser(browser);
 
     return buffers;
+  }
+
+  async scrapeBulkProfilePages(steamIds: string[]): Promise<string[]> {
+    const cluster = await Cluster.launch({
+      puppeteerOptions: {
+        headless: false,
+        args: ['--proxy-server="direct://"', '--proxy-bypass-list=*'],
+      } as any,
+      skipDuplicateUrls: true,
+      concurrency: Cluster.CONCURRENCY_PAGE,
+      maxConcurrency: 4,
+    });
+
+    const documents: string[] = [];
+    await cluster.task(async ({ page, data }) => {
+      await page.goto(RglPages.PROFILE_PAGE + data, {
+        waitUntil: 'domcontentloaded',
+      });
+
+      await page.waitForTimeout(1000);
+
+      // Holy hackathon...
+      const body = await page.$eval('body', el => el.innerHTML);
+      documents.push(body);
+    });
+
+    steamIds.forEach(sid => cluster.queue(sid));
+
+    await cluster.idle();
+    await cluster.close();
+
+    return documents;
   }
 }

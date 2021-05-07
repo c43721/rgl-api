@@ -5,12 +5,16 @@ import { ProfileBan, Profile } from '../profile/profile.interface';
 import ProfileNotFoundException from './exceptions/ProfileNotFoundException';
 import { RglPages } from './enums/rgl.enum';
 import ProfileHelper from './rgl.helper';
+import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
 
 @Injectable()
 export class RglService {
   private logger = new Logger(RglService.name);
 
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    private puppeteerService: PuppeteerService,
+  ) {}
 
   private getPage(page: RglPages | string) {
     return this.httpService
@@ -23,73 +27,22 @@ export class RglService {
       .toPromise();
   }
 
-  public async getBans(): Promise<Ban[]> {
-    const timer = Date.now();
-    this.logger.debug('Querying bans page from RGL...');
-    const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
-
-    this.logger.debug(`Bans page loaded in ${Date.now() - timer} ms`);
-    const $ = load(bansPage);
-
-    const players = [];
-    const reasons = [];
-
-    $('tbody > tr').each((index, element) => {
-      const currentElement = $(element);
-      // This is necessary, since each "block" of user/reasons are separated by tr's
-      if (index % 2 !== 0) return reasons.push(currentElement.text().trim());
-
-      const banId = currentElement.attr('id');
-      const steamid = $(currentElement.find('td')[0]).text().trim();
-      const div = $(currentElement.find('td')[2]).text().trim() ?? null;
-      const teamId = $(currentElement.find('td')[3])
-        .find('a')
-        .attr('href')
-        .split('=')[1];
-
-      let teamDetails: TeamDetails = null;
-      if (div) {
-        teamDetails = {
-          div,
-          name: $(currentElement.find('td')[3]).text().trim(),
-          id: teamId,
-          link: `${RglPages.TEAM_PAGE}${teamId}`,
-        };
-      }
-
-      const expiresAtString = $(currentElement.find('td')[4]).text().trim();
-
-      players.push({
-        banId,
-        steamId: steamid,
-        name: $(currentElement.find('td')[1]).text().trim(),
-        link: `${RglPages.PROFILE_PAGE}${steamid}`,
-        expiresAt: new Date(expiresAtString),
-        teamDetails,
-      });
-    });
-
-    const playerWithReason = players.map(
-      (val, i) => (val = { ...val, reason: reasons[i] }),
-    );
-
-    return playerWithReason;
-  }
-
-  public async getProfile(steamId: string): Promise<Profile> {
-    this.logger.debug(`Querying profile page (${steamId}) from RGL...`);
-    const timer = Date.now();
-    const { data: profilePage } = await this.getPage(
-      RglPages.PROFILE_PAGE + steamId,
-    );
-    this.logger.debug(
-      `Profile (${steamId}) page loaded in ${Date.now() - timer} ms`,
-    );
-
-    const $ = load(profilePage);
+  private parseProfilePage(
+    steamId: string,
+    page: string,
+    throwError: boolean = true,
+  ) {
+    const $ = load(page);
     const hasProfile = $(ProfileHelper.player.hasAccount).text().trim();
-    if (!!hasProfile) throw new ProfileNotFoundException(steamId, hasProfile);
-
+    if (!!hasProfile && throwError) {
+      throw new ProfileNotFoundException(steamId, hasProfile);
+    } else if (!!hasProfile && !throwError) {
+      // Can't throw exceptions on bulk profiles.
+      return {
+        steamId,
+        message: hasProfile,
+      } as any;
+    }
     const trophiesRaw = $(ProfileHelper.player.trophies).text().split(/\s+/);
 
     const name = $(ProfileHelper.player.name).text();
@@ -200,5 +153,89 @@ export class RglService {
       experience,
       banHistory: allBans.reverse(), // Reversing so that we get new bans on top
     };
+  }
+
+  async getBans(): Promise<Ban[]> {
+    const timer = Date.now();
+    this.logger.debug('Querying bans page from RGL...');
+    const { data: bansPage } = await this.getPage(RglPages.BAN_PAGE);
+
+    this.logger.debug(`Bans page loaded in ${Date.now() - timer} ms`);
+    const $ = load(bansPage);
+
+    const players = [];
+    const reasons = [];
+
+    $('tbody > tr').each((index, element) => {
+      const currentElement = $(element);
+      // This is necessary, since each "block" of user/reasons are separated by tr's
+      if (index % 2 !== 0) return reasons.push(currentElement.text().trim());
+
+      const banId = currentElement.attr('id');
+      const steamid = $(currentElement.find('td')[0]).text().trim();
+      const div = $(currentElement.find('td')[2]).text().trim() ?? null;
+      const teamId = $(currentElement.find('td')[3])
+        .find('a')
+        .attr('href')
+        .split('=')[1];
+
+      let teamDetails: TeamDetails = null;
+      if (div) {
+        teamDetails = {
+          div,
+          name: $(currentElement.find('td')[3]).text().trim(),
+          id: teamId,
+          link: `${RglPages.TEAM_PAGE}${teamId}`,
+        };
+      }
+
+      const expiresAtString = $(currentElement.find('td')[4]).text().trim();
+
+      players.push({
+        banId,
+        steamId: steamid,
+        name: $(currentElement.find('td')[1]).text().trim(),
+        link: `${RglPages.PROFILE_PAGE}${steamid}`,
+        expiresAt: new Date(expiresAtString),
+        teamDetails,
+      });
+    });
+
+    const playerWithReason = players.map(
+      (val, i) => (val = { ...val, reason: reasons[i] }),
+    );
+
+    return playerWithReason;
+  }
+
+  async getBulkProfiles(steamIdArray: string[]): Promise<Profile[]> {
+    const documents = await this.puppeteerService.scrapeBulkProfilePages(
+      steamIdArray,
+    );
+
+    const profiles: Profile[] = [];
+    for (let i = 0; i < documents.length; i++) {
+      const steamId = steamIdArray[i];
+      const document = documents[i];
+
+      profiles.push(this.parseProfilePage(steamId, document, false));
+    }
+
+    return profiles;
+  }
+
+  async getProfile(steamId: string): Promise<Profile> {
+    this.logger.debug(`Querying profile page (${steamId}) from RGL...`);
+
+    const timer = Date.now();
+    const { data: profilePage } = await this.getPage(
+      RglPages.PROFILE_PAGE + steamId,
+    );
+
+    this.logger.debug(
+      `Profile (${steamId}) page loaded in ${Date.now() - timer} ms`,
+    );
+
+    return this.parseProfilePage(steamId, profilePage);
   }
 }
