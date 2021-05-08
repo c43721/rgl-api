@@ -53,7 +53,7 @@ export class ProfileService {
 
     const toCacheIds: string[] = [];
     const toCacheProfiles: Profile[] = [];
-    registeredPlayers.map(p => {
+    registeredPlayers.forEach(p => {
       toCacheIds.push(p.steamId);
       toCacheProfiles.push(p);
     });
