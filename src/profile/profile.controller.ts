@@ -3,6 +3,8 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseBoolPipe,
   Post,
@@ -21,12 +23,17 @@ export class ProfileController {
   constructor(private profileService: ProfileService) {}
 
   @Post('/bulk')
+  @HttpCode(HttpStatus.OK)
   bulkProfiles(
     @Body(new ValidationPipe({ transform: true }))
     { profiles, formats, onlyActive }: BulkProfileQueryDto,
   ) {
     const distinctProfiles = [...new Set(profiles)];
-    return this.profileService.getBulkProfiles(distinctProfiles, formats, onlyActive);
+    return this.profileService.getBulkProfiles(
+      distinctProfiles,
+      formats,
+      onlyActive,
+    );
   }
 
   @Get(':steamid')
