@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsBooleanString,
   IsNotEmpty,
   IsOptional,
@@ -21,16 +22,16 @@ function transform(toConvert: string) {
 }
 
 export class ProfileQueryDto {
-  @IsArray()
   @IsOptional()
+  @IsArray()
   @Transform(({ value }) => value.split(',').map(transform))
   /**
    * Filter for formats or 'gamemodes'
    */
   readonly formats: string[];
 
-  @IsBooleanString()
   @IsOptional()
+  @IsBooleanString()
   /**
    * Filter for active teams
    */
@@ -38,7 +39,6 @@ export class ProfileQueryDto {
 }
 
 export class BulkProfileQueryDto extends ProfileQueryDto {
-  @IsNotEmpty()
   @IsArray()
   @IsSteamIdArray()
   @Transform(({ value }) =>
@@ -48,4 +48,16 @@ export class BulkProfileQueryDto extends ProfileQueryDto {
    * Profiles in SteamID64 format
    */
   readonly profiles: string[];
+
+  @IsBoolean()
+  /**
+   * Trim down response to only experience and name
+   */
+  readonly slim: boolean = false;
+
+  @IsBoolean()
+  /**
+   * Filter for active teams
+   */
+  readonly onlyActive: boolean = false;
 }

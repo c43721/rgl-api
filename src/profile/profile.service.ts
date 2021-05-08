@@ -16,6 +16,7 @@ export class ProfileService {
     steamIdArray: string[],
     formats: string[],
     onlyActive: boolean,
+    slim: boolean,
   ) {
     /*
       This all deserves an explaination:
@@ -76,7 +77,9 @@ export class ProfileService {
         );
       }
 
-      return { ...rest, experience };
+      return slim
+        ? { steamId: rest.steamId, name: rest.name, experience }
+        : { ...rest, experience };
     });
   }
 
