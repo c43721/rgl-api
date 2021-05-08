@@ -26,13 +26,14 @@ export class ProfileController {
   @HttpCode(HttpStatus.OK)
   bulkProfiles(
     @Body(new ValidationPipe({ transform: true }))
-    { profiles, formats, onlyActive }: BulkProfileQueryDto,
+    { profiles, formats, onlyActive, slim }: BulkProfileQueryDto,
   ) {
     const distinctProfiles = [...new Set(profiles)];
     return this.profileService.getBulkProfiles(
       distinctProfiles,
       formats,
       onlyActive,
+      slim
     );
   }
 
