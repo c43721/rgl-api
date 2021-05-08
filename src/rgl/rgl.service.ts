@@ -209,6 +209,15 @@ export class RglService {
   }
 
   async getBulkProfiles(steamIdArray: string[]): Promise<Profile[]> {
+    // We don't want to do unneeded puppeteer instantiation if we don't have to
+    if (steamIdArray.length === 1) {
+      const { data: page } = await this.getPage(
+        RglPages.PROFILE_PAGE + steamIdArray[0],
+      );
+
+      // Return array so that we don't have more branch conditions
+      return [this.parseProfilePage(steamIdArray[0], page, false)];
+    }
     const documents = await this.puppeteerService.scrapeBulkProfilePages(
       steamIdArray,
     );

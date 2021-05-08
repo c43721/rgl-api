@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CacheService } from 'src/cache/cache.service';
 import { RglService } from 'src/rgl/rgl.service';
-import { Experience, ProfileBanDetails } from './profile.interface';
+import { Experience, Profile, ProfileBanDetails } from './profile.interface';
 
 @Injectable()
 export class ProfileService {
+  private logger = new Logger(ProfileService.name);
+
   constructor(
     private rglService: RglService,
     private cacheService: CacheService,
@@ -15,9 +17,50 @@ export class ProfileService {
     formats: string[],
     onlyActive: boolean,
   ) {
-    const bulkProfiles = await this.rglService.getBulkProfiles(steamIdArray);
+    /*
+      This all deserves an explaination:
 
-    return bulkProfiles.map(profile => {
+      Basically, we want to ensure that each profile coming is 3 things:
+        1) Unique
+        2) Cached or not Cached
+        3) Real Id
+
+      1 and 3 are mostly done by pipes and transforms, but 2 is needed to be done here.
+
+      The way to achieve that could just be a foreach over the steamids and do a GET from Redis.
+      This comes at a huge performance penalty at both Redis and Service level
+
+      So instead, we grab the cached profiles first, then we create the differences array and scrape those only
+
+      And we can push the cached and scraped profiles to the final profile array, which will parse how we want it to (like for single profiles)
+
+      In the end, we end up doing n less operations to Redis by using mget and mset
+    */
+    const finalProfileArray: Profile[] = [];
+
+    const cachedProfiles = await this.cacheService.getBulkProfileCache(
+      steamIdArray,
+    );
+    finalProfileArray.push(...cachedProfiles);
+
+    const cachedIds = cachedProfiles.map(p => p.steamId);
+    const diffIds = steamIdArray.filter(id => !cachedIds.includes(id));
+
+    const bulkProfiles = await this.rglService.getBulkProfiles(diffIds);
+
+    const registeredPlayers = bulkProfiles.filter((p: any) => !p.message);
+
+    const toCacheIds: string[] = [];
+    const toCacheProfiles: Profile[] = [];
+    registeredPlayers.map(p => {
+      toCacheIds.push(p.steamId);
+      toCacheProfiles.push(p);
+    });
+
+    await this.cacheService.setBulkProfileCache(toCacheIds, toCacheProfiles);
+
+    finalProfileArray.push(...bulkProfiles);
+    return finalProfileArray.map(profile => {
       // Hacky, but worth.
       if ((profile as any).message) return profile;
 
