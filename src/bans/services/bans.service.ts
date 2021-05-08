@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { RglService } from '../../rgl/rgl.service';
-import { CronNames } from '../../enums/crons.enum';
+import { CronNames } from '../../lib/enums/crons.enum';
 import { Ban } from '../interfaces/bans.interface';
 import { CacheService } from 'src/cache/cache.service';
 import { Events } from 'src/events/events';
