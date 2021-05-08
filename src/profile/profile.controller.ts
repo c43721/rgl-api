@@ -58,18 +58,14 @@ export class ProfileController {
     return { ...rest, experience };
   }
 
-  /**
-   * Hotfix for bypassing cache.
-   * Remove please sometime when I fix this...
-   */
-  @Get(':steamid/cache-bypass')
-  async disableCache(
+  @Get(':steamid/experience')
+  async experience(
     @Param('steamid', SteamId64Pipe) steamId: string,
     @Query(new ValidationPipe({ transform: true }))
     { formats, onlyActive }: ProfileQueryDto,
   ) {
-    const profile = await this.profileService.getProfile(steamId, true);
-    let { experience, banHistory, ...rest } = profile;
+    const profile = await this.profileService.getProfile(steamId);
+    let { experience, name } = profile;
 
     if (formats) {
       experience = this.profileService.filterExperience(experience, formats);
@@ -81,7 +77,7 @@ export class ProfileController {
       );
     }
 
-    return { ...rest, experience };
+    return { steamId, name, experience };
   }
 
   @Get(':steamid/bans')
