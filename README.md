@@ -29,7 +29,7 @@ Each event will be under its own heading with complete details on return values 
 
 ### Recieve: `bans`
 
-Will respond with all bans in the current scraping period. You will be guarenteed there is at least 1 in the array.
+Will respond with all new bans in the current scraping period. You will be guarenteed there is at least 1 in the array, as well as being a non-duplicate.
 
 ```js
 [
@@ -65,7 +65,7 @@ All routes are currently prefixed with `/api/v1/`. You will need to include this
 }
 ```
 
-The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64`.
+The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64` in string format.
 
 Custom errors will be responded in this format, following other errors. Note that if a profile is not found, we throw a 404. This is to ensure that you can handle unfound profiles better.
 Example:
