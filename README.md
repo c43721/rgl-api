@@ -118,7 +118,7 @@ Example:
 
 ## Profile API
 
-All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached.
+All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached. Bulk profiles will be cached for **3 days**, subject to change.
 
 ### GET `/profiles/:steamid`
 
