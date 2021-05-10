@@ -218,6 +218,7 @@ export class RglService {
       // Return array so that we don't have more branch conditions
       return [this.parseProfilePage(steamIdArray[0], page, false)];
     }
+    
     const documents = await this.puppeteerService.scrapeBulkProfilePages(
       steamIdArray,
     );

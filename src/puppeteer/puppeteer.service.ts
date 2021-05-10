@@ -53,6 +53,9 @@ export class PuppeteerService {
 
   private async createPage(url: string) {
     const browser = await launchBrowser({
+      // testing purposes
+      // headless: false,
+      // args: ['--proxy-server="direct://"', '--proxy-bypass-list=*'],
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: {
         // Needed or else screenshots can't be created
