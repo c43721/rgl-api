@@ -67,16 +67,14 @@ All routes are currently prefixed with `/api/v1/`. You will need to include this
 
 The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64`.
 
-Custom errors will be responded with the `data` object as well. This may be subject to change, but is in place for consistancy for now.
+Custom errors will be responded in this format, following other errors. Note that if a profile is not found, we throw a 404. This is to ensure that you can handle unfound profiles better.
 Example:
 
 ```js
 {
-    "data": {
-        "statusCode": 404,
-        "message": "Error message",
-        "error": "Error"
-    }
+    "statusCode": 404,
+    "message": "Error message",
+    "error": "Error"
 }
 ```
 
@@ -201,6 +199,93 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
             "expires": Date,
             "isCurrentBan": Boolean
         }],
+    },
+    "time": "0 ms"
+}
+```
+
+<br />
+
+### GET `/profiles/:steamid/experience`
+
+**Query fields:**
+| Name | Type | Description |
+|--|--|--|
+| details | boolean | Details of the current ban the user has |
+| previous | boolean | Array of details of all past bans the user had |
+
+**Note**: This is just a slimmer version of the index route, useful for when working with known profiles and only need relavent experience. Returns empty array if user has no experience.
+
+```js
+{
+    "data": {
+        "steamId": String,
+        "name": String,
+        "experience": [{
+            "category": String,
+            "format": String,
+            "season": String,
+            "div": String,
+            "team": String,
+            "endRank": String,
+            "recordWith": Date,
+            "recordWithout": null | Date,
+            "amountWon": Number,
+            "joined": Date,
+            "left": null | Date,
+            "isCurrentTeam": Boolean,
+        }],
+    },
+    "time": "0 ms"
+}
+```
+
+<br />
+
+### POST `/profiles/:steamid/bulk`
+
+**Body fields:**
+| Name | Type | Description |
+|--|--|--|
+| profiles | array | Array of SteamIds (any format) to parse |
+| formats? | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
+| onlyActive? | boolean | Only return "active" teams, which the user is currently playing or has not left |
+| slim? | boolean | Return 'slimmed' response, see <a href="#get-profilessteamidexperience">example response</a> |
+
+```js
+{
+    "data": {
+        {
+           "steamId": String,
+            "avatar": String,
+            "name": String,
+            "link": String,
+            "status": {
+                "banned": Boolean,
+                "probation": Boolean,
+                "verified": Boolean
+            },
+            "totalEarnings": Number,
+            "trophies": {
+                "gold": Number,
+                "silver": Number,
+                "bronze": Number
+            },
+            "experience": [{
+                "category": String,
+                "format": String,
+                "season": String,
+                "div": String,
+                "team": String,
+                "endRank": String,
+                "recordWith": Date,
+                "recordWithout": null | Date,
+                "amountWon": Number,
+                "joined": Date,
+                "left": null | Date,
+                "isCurrentTeam": Boolean,
+            }],
+        }
     },
     "time": "0 ms"
 }
