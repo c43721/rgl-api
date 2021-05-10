@@ -42,7 +42,6 @@ export class ProfileService {
     const cachedProfiles = await this.cacheService.getBulkProfileCache(
       steamIdArray,
     );
-    finalProfileArray.push(...cachedProfiles);
 
     const cachedIds = cachedProfiles.map(p => p.steamId);
     const diffIds = steamIdArray.filter(id => !cachedIds.includes(id));
@@ -60,8 +59,7 @@ export class ProfileService {
 
     await this.cacheService.setBulkProfileCache(toCacheIds, toCacheProfiles);
 
-    finalProfileArray.push(...bulkProfiles);
-    return finalProfileArray.map(profile => {
+    return [...cachedProfiles, ...bulkProfiles].map(profile => {
       // Hacky, but worth.
       if ((profile as any).message) return profile;
 
@@ -83,9 +81,7 @@ export class ProfileService {
     });
   }
 
-  async getProfile(steamId: string, disableCache: boolean = false) {
-    if (disableCache) return await this.rglService.getProfile(steamId);
-
+  async getProfile(steamId: string) {
     const cachedProfile = await this.cacheService.getProfileCache(steamId);
 
     if (!cachedProfile) {
