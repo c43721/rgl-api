@@ -18,6 +18,10 @@ export class ProfileService {
     onlyActive: boolean,
     slim: boolean,
   ) {
+    this.logger.verbose(
+      `Parsing bulk profiles with ${steamIdArray.length} ids`,
+    );
+    this.logger.debug(`Profiles:\n${steamIdArray.join(' ')}`);
     /*
       This all deserves an explaination:
 
@@ -37,8 +41,6 @@ export class ProfileService {
 
       In the end, we end up doing n less operations to Redis by using mget and mset
     */
-    const finalProfileArray: Profile[] = [];
-
     const cachedProfiles = await this.cacheService.getBulkProfileCache(
       steamIdArray,
     );
