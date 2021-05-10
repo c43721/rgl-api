@@ -297,7 +297,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 
 | Name   | Values                                   |
 | ------ | ---------------------------------------- |
-| format | `sixes, highlander, prolander, nr6s, nr` |
+| formats | `sixes, highlander, prolander, nr6s, nr` |
 
 # Issues, Questions
 
