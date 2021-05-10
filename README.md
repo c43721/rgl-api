@@ -256,7 +256,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 {
     "data": {
         {
-           "steamId": String,
+            "steamId": String,
             "avatar": String,
             "name": String,
             "link": String,
