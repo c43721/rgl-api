@@ -121,11 +121,12 @@ export class PuppeteerService {
 
   async scrapeBulkProfilePages(steamIds: string[]): Promise<string[]> {
     const cluster = await Cluster.launch({
-      // testing purposes
-      // puppeteerOptions: {
-      //   headless: false,
-      //   args: ['--proxy-server="direct://"', '--proxy-bypass-list=*'],
-      // } as any,
+      puppeteerOptions: {
+        // testing purposes
+        // headless: false,
+        // args: ['--proxy-server="direct://"', '--proxy-bypass-list=*'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      } as any,
       skipDuplicateUrls: true,
       concurrency: Cluster.CONCURRENCY_PAGE,
       maxConcurrency: 4,
