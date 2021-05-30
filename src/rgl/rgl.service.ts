@@ -168,8 +168,12 @@ export class RglService {
 
     $('tbody > tr').each((index, element) => {
       const currentElement = $(element);
+      
       // This is necessary, since each "block" of user/reasons are separated by tr's
-      if (index % 2 !== 0) return reasons.push(currentElement.text().trim());
+      if (index % 2 !== 0) {
+        reasons.push(currentElement.text().trim());
+        return;
+      }
 
       const banId = currentElement.attr('id');
       const steamid = $(currentElement.find('td')[0]).text().trim();
@@ -218,7 +222,7 @@ export class RglService {
       // Return array so that we don't have more branch conditions
       return [this.parseProfilePage(steamIdArray[0], page, false)];
     }
-    
+
     const documents = await this.puppeteerService.scrapeBulkProfilePages(
       steamIdArray,
     );

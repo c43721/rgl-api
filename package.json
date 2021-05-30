@@ -31,7 +31,7 @@
     "@nestjs/websockets": "^7.6.15",
     "cache-manager": "^3.4.1",
     "cache-manager-redis-store": "^2.0.0",
-    "cheerio": "^1.0.0-rc.5",
+    "cheerio": "^1.0.0-rc.9",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "date-fns": "^2.19.0",
