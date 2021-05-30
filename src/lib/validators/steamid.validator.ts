@@ -14,6 +14,7 @@ export function IsSteamIdArray(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(idArray: string[], args: ValidationArguments) {
+          if (!idArray) return false;
           const idObjects = idArray.map(id => new SteamID(id));
           const hasBadIds = idObjects.every(id => id.isValid());
           return hasBadIds;

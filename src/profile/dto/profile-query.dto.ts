@@ -40,6 +40,7 @@ export class ProfileQueryDto {
 
 export class BulkProfileQueryDto extends ProfileQueryDto {
   @IsArray()
+  @IsNotEmpty({ each: true })
   @IsSteamIdArray()
   @Transform(({ value }) =>
     value.map((v: string) => new SteamID(v).getSteamID64()),
