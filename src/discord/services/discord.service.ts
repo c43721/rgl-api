@@ -130,7 +130,8 @@ export class DiscordService {
       const banType = this.getTypeOfBan(ban);
       const fields = this.createFields(ban);
 
-      const discordAttachment = new MessageAttachment(buffers[i], 'ban.png');
+      const banImageName = `ban-${ban.steamId}.png`;
+      const discordAttachment = new MessageAttachment(buffers[i], banImageName);
 
       const embed = new MessageEmbed({
         title: `${ban.name} ${banType.type}`,
@@ -140,7 +141,7 @@ export class DiscordService {
         url: ban.link,
         fields,
         image: {
-          url: `attachment://ban.png`,
+          url: `attachment://${banImageName}`,
         },
         files: [discordAttachment],
       });
