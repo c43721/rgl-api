@@ -41,9 +41,9 @@ export class ProfileController {
   async index(
     @Param('steamid', SteamId64Pipe) steamId: string,
     @Query(new ValidationPipe({ transform: true }))
-    { formats, onlyActive }: ProfileQueryDto,
+    { formats, onlyActive, disableCache }: ProfileQueryDto,
   ) {
-    const profile = await this.profileService.getProfile(steamId);
+    const profile = await this.profileService.getProfile(steamId, disableCache);
     let { experience, banHistory, ...rest } = profile;
 
     if (formats) {
@@ -63,9 +63,9 @@ export class ProfileController {
   async experience(
     @Param('steamid', SteamId64Pipe) steamId: string,
     @Query(new ValidationPipe({ transform: true }))
-    { formats, onlyActive }: ProfileQueryDto,
+    { formats, onlyActive, disableCache }: ProfileQueryDto,
   ) {
-    const profile = await this.profileService.getProfile(steamId);
+    const profile = await this.profileService.getProfile(steamId, disableCache);
     let { experience, name } = profile;
 
     if (formats) {

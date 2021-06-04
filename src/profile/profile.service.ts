@@ -83,8 +83,10 @@ export class ProfileService {
     });
   }
 
-  async getProfile(steamId: string) {
-    const cachedProfile = await this.cacheService.getProfileCache(steamId);
+  async getProfile(steamId: string, disableCache?: boolean) {
+    const cachedProfile = disableCache
+      ? await this.rglService.getProfile(steamId)
+      : await this.cacheService.getProfileCache(steamId);
 
     if (!cachedProfile) {
       const profile = await this.rglService.getProfile(steamId);

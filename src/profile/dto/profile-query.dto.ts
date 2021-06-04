@@ -36,6 +36,13 @@ export class ProfileQueryDto {
    * Filter for active teams
    */
   readonly onlyActive: boolean;
+
+  @IsOptional()
+  @IsBooleanString()
+  /**
+   * Disable caching of this request
+   */
+  readonly disableCache: boolean = false;
 }
 
 export class BulkProfileQueryDto extends ProfileQueryDto {
