@@ -42,7 +42,7 @@ export class ProfileQueryDto {
   /**
    * Disable caching of this request
    */
-  readonly disableCache: boolean = false;
+  readonly disableCache: boolean;
 }
 
 export class BulkProfileQueryDto extends ProfileQueryDto {
