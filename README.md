@@ -127,6 +127,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 |--|--|--|
 | formats | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
 | onlyActive | boolean | Only return "active" teams, which the user is currently playing or has not left |
+| disableCache | boolean | Disable the cache (Allows for knowing for certain the data is fresh) |
 <br/>
 
 ```js
@@ -213,6 +214,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 |--|--|--|
 | details | boolean | Details of the current ban the user has |
 | previous | boolean | Array of details of all past bans the user had |
+| disableCache | boolean | Disable the cache (Allows for knowing for certain the data is fresh) |
 
 **Note**: This is just a slimmer version of the index route, useful for when working with known profiles and only need relavent experience. Returns empty array if user has no experience.
 
