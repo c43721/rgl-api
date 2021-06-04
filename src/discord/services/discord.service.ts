@@ -44,7 +44,7 @@ export class DiscordService {
   async sendDiscordEmbeds(bans: Ban[], buffers: Buffer[]) {
     const embedObjects = this.createEmbedObjects(bans, buffers);
 
-    this.sendDiscordNotification(embedObjects);
+    await this.sendDiscordNotification(embedObjects);
   }
 
   private getTypeOfBan(ban: Ban): BanType {
