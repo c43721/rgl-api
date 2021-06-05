@@ -17,9 +17,10 @@ export class DiscordEventListenerService implements OnModuleInit {
   }
 
   async newBans(bans: Ban[]) {
-    const screenshots: Buffer[] = await this.puppeteerService.generateBulkBanScreenshots(
+    const screenshots = await this.puppeteerService.generateBulkBanScreenshots(
       bans.map(ban => ban.banId),
     );
+
     await this.discordService.sendDiscordEmbeds(bans, screenshots);
   }
 }

@@ -29,7 +29,7 @@ Each event will be under its own heading with complete details on return values 
 
 ### Recieve: `bans`
 
-Will respond with all bans in the current scraping period. You will be guarenteed there is at least 1 in the array.
+Will respond with all new bans in the current scraping period. You will be guarenteed there is at least 1 in the array, as well as being a non-duplicate.
 
 ```js
 [
@@ -65,18 +65,16 @@ All routes are currently prefixed with `/api/v1/`. You will need to include this
 }
 ```
 
-The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64`.
+The `time` field is the amount of the the server took to respond to your request, useful for debugging or seeing if you're hitting a cache or fresh data. Request's SteamID can be in **any** format and all returned `steamId` fields will be `SteamID64` in string format.
 
-Custom errors will be responded with the `data` object as well. This may be subject to change, but is in place for consistancy for now.
+Custom errors will be responded in this format, following other errors. Note that if a profile is not found, we throw a 404. This is to ensure that you can handle unfound profiles better.
 Example:
 
 ```js
 {
-    "data": {
-        "statusCode": 404,
-        "message": "Error message",
-        "error": "Error"
-    }
+    "statusCode": 404,
+    "message": "Error message",
+    "error": "Error"
 }
 ```
 
@@ -120,7 +118,7 @@ Example:
 
 ## Profile API
 
-All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached.
+All requests to the Profile API will be cached for **7 days**. Subsequent requests will not refresh that timer. This is to ensure common profiles can be cached and served faster. Average request times vary between 200-400 milliseconds cached and 3-5 seconds uncached. Bulk profiles will be cached for **3 days**, subject to change.
 
 ### GET `/profiles/:steamid`
 
@@ -129,6 +127,7 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 |--|--|--|
 | formats | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
 | onlyActive | boolean | Only return "active" teams, which the user is currently playing or has not left |
+| disableCache | boolean | Disable the cache (Allows for knowing for certain the data is fresh) |
 <br/>
 
 ```js
@@ -208,11 +207,99 @@ All requests to the Profile API will be cached for **7 days**. Subsequent reques
 
 <br />
 
+### GET `/profiles/:steamid/experience`
+
+**Query fields:**
+| Name | Type | Description |
+|--|--|--|
+| details | boolean | Details of the current ban the user has |
+| previous | boolean | Array of details of all past bans the user had |
+| disableCache | boolean | Disable the cache (Allows for knowing for certain the data is fresh) |
+
+**Note**: This is just a slimmer version of the index route, useful for when working with known profiles and only need relavent experience. Returns empty array if user has no experience.
+
+```js
+{
+    "data": {
+        "steamId": String,
+        "name": String,
+        "experience": [{
+            "category": String,
+            "format": String,
+            "season": String,
+            "div": String,
+            "team": String,
+            "endRank": String,
+            "recordWith": Date,
+            "recordWithout": null | Date,
+            "amountWon": Number,
+            "joined": Date,
+            "left": null | Date,
+            "isCurrentTeam": Boolean,
+        }],
+    },
+    "time": "0 ms"
+}
+```
+
+<br />
+
+### POST `/profiles/:steamid/bulk`
+
+**Body fields:**
+| Name | Type | Description |
+|--|--|--|
+| profiles | array | Array of SteamIds (any format) to parse |
+| formats? | <a href="#enums">enum</a> | String or comma-separated string of the formats (sixes, highlander, ect) |
+| onlyActive? | boolean | Only return "active" teams, which the user is currently playing or has not left |
+| slim? | boolean | Return 'slimmed' response, see <a href="#get-profilessteamidexperience">example response</a> |
+
+```js
+{
+    "data": {
+        {
+            "steamId": String,
+            "avatar": String,
+            "name": String,
+            "link": String,
+            "status": {
+                "banned": Boolean,
+                "probation": Boolean,
+                "verified": Boolean
+            },
+            "totalEarnings": Number,
+            "trophies": {
+                "gold": Number,
+                "silver": Number,
+                "bronze": Number
+            },
+            "experience": [{
+                "category": String,
+                "format": String,
+                "season": String,
+                "div": String,
+                "team": String,
+                "endRank": String,
+                "recordWith": Date,
+                "recordWithout": null | Date,
+                "amountWon": Number,
+                "joined": Date,
+                "left": null | Date,
+                "isCurrentTeam": Boolean,
+            }],
+        }
+    },
+    "time": "0 ms"
+}
+```
+
+<br />
+
 # Enums
 
 | Name   | Values                                   |
 | ------ | ---------------------------------------- |
-| format | `sixes, highlander, prolander, nr6s, nr` |
+| formats | `sixes, highlander, prolander, nr6s, nr` |
 
 # Issues, Questions
 

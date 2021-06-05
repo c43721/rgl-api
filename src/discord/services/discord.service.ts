@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 import * as moment from 'moment';
 import { Ban } from 'src/bans/interfaces/bans.interface';
-import { Colors } from 'src/enums/colors.enum';
+import { Colors } from 'src/lib/enums/colors.enum';
 
 enum BanTypes {
   WARNING = 'warned',
@@ -44,7 +44,7 @@ export class DiscordService {
   async sendDiscordEmbeds(bans: Ban[], buffers: Buffer[]) {
     const embedObjects = this.createEmbedObjects(bans, buffers);
 
-    this.sendDiscordNotification(embedObjects);
+    await this.sendDiscordNotification(embedObjects);
   }
 
   private getTypeOfBan(ban: Ban): BanType {
@@ -130,7 +130,8 @@ export class DiscordService {
       const banType = this.getTypeOfBan(ban);
       const fields = this.createFields(ban);
 
-      const discordAttachment = new MessageAttachment(buffers[i], 'ban.png');
+      const banImageName = `ban-${ban.steamId}.png`;
+      const discordAttachment = new MessageAttachment(buffers[i], banImageName);
 
       const embed = new MessageEmbed({
         title: `${ban.name} ${banType.type}`,
@@ -140,7 +141,7 @@ export class DiscordService {
         url: ban.link,
         fields,
         image: {
-          url: `attachment://ban.png`,
+          url: `attachment://${banImageName}`,
         },
         files: [discordAttachment],
       });
