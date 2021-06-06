@@ -6,6 +6,8 @@ import ProfileNotFoundException from './exceptions/ProfileNotFoundException';
 import { RglPages } from './enums/rgl.enum';
 import ProfileHelper from './rgl.helper';
 import { PuppeteerService } from 'src/puppeteer/puppeteer.service';
+import { firstValueFrom, timer } from 'rxjs';
+import { delayWhen, retryWhen, take, tap } from 'rxjs/operators';
 
 @Injectable()
 export class RglService {
@@ -16,15 +18,25 @@ export class RglService {
     private puppeteerService: PuppeteerService,
   ) {}
 
-  private getPage(page: RglPages | string) {
-    return this.httpService
+  private async getPage(page: RglPages | string) {
+    const source$ = this.httpService
       .get(page, {
         headers: {
           'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
         },
       })
-      .toPromise();
+      .pipe(
+        retryWhen(errors =>
+          errors.pipe(
+            tap(error => this.logger.warn(error)),
+            delayWhen(val => timer(val * 7500)),
+            take(5),
+          ),
+        ),
+      );
+
+    return await firstValueFrom(source$);
   }
 
   private parseProfilePage(
@@ -168,7 +180,7 @@ export class RglService {
 
     $('tbody > tr').each((index, element) => {
       const currentElement = $(element);
-      
+
       // This is necessary, since each "block" of user/reasons are separated by tr's
       if (index % 2 !== 0) {
         reasons.push(currentElement.text().trim());
