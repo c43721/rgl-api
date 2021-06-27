@@ -4,6 +4,8 @@
 
 # Description
 
+**Note**: This API is no longer active. The owner of the site decided to not provide API access nor to include it first-party. You may go against their wishes at your own risk.
+
 This serves as the unofficial API for RGL, serving routes for getting a user's profile, ban history, or getting the most recent bans.
 
 The idea behind this project is to give developers a way to interact with the RGL page through an API, since one is not supported. We hope that providing a more open API will give better toolings to developers to create great projects.
